@@ -16,6 +16,17 @@ void setup() {
   USBInit();
   CH446Q_init();
   CH446Q_reset();
+
+  pinMode(12,OUTPUT);
+  digitalWrite(12,LOW);
+  CH446Q_switch_channel(9, 3, true);
+  CH446Q_switch_channel(7, 4, true);
+
+  analogWrite(25, 64);
+
+  //delay(100);
+  //CH446Q_reset();
+  
 }
 
 void loop() {
@@ -77,6 +88,12 @@ void loop() {
 
   USBSerial_flush();
 
+analogWrite(12,64);
+  analogWrite(25, 64);
+delay(100);
+digitalWrite(12,128);
+  digitalWrite(25, LOW);
+  delay(100);
 
   /*CH446Q_switch_channel(10,7,false);
     CH446Q_switch_channel(11,7,true);

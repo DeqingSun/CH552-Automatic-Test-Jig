@@ -41,8 +41,8 @@ __code uint16_t CfgDescLen = sizeof(CfgDesc);
 __code uint8_t LangDes[]={0x04,0x03,0x09,0x04};           //Language Descriptor
 __code uint16_t LangDesLen = sizeof(LangDes);
 __code uint16_t SerDes[]={                                 //Serial String Descriptor
-    0x030C,
-    'C','H','5','5','x',
+    0x0314,
+    'C','H','5','5','9',' ','j','i','g'
 };
 __code uint16_t SerDesLen = sizeof(SerDes);
 __code uint16_t Prod_Des[]={                                //Produce String Descriptor
