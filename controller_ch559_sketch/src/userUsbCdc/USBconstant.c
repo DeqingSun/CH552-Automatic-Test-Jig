@@ -52,8 +52,8 @@ __code uint16_t Prod_Des[]={                                //Produce String Des
 __code uint16_t Prod_DesLen = sizeof(Prod_Des);
 
 __code uint16_t CDC_Des[]={
-    0x0316,
-    'C','D','C',' ','S','e','r','i','a','l',
+    0x0328,
+    'T','e','s','t',' ','j','i','g',' ','c','o','n','t','r','o','l','l','e','r'
 };
 __code uint16_t CDC_DesLen = sizeof(CDC_Des);
 
