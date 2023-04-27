@@ -75,7 +75,13 @@ void loop() {
           case 'B':
             if (rxSerialBufferPtr == 1) {
               USBSerial_println("B: CH552 boot mode");
-              CH446Q_reset();
+              CH552_enter_bootloader();
+            }
+            break;
+          case 'b':
+            if (rxSerialBufferPtr == 1) {
+              USBSerial_println("b: CH552 reboot usercode");
+              CH552_reboot_usercode();
             }
             break;
           default:
@@ -115,12 +121,12 @@ void loop() {
     CH446Q_switch_channel(11,7,false);
     delay(3000);*/
 
-  CH552_enter_bootloader();
+  /*CH552_enter_bootloader();
     delay(10000);
     CH446Q_reset();
     CH552_power(0); 
     delay(10);
     CH552_power(1); 
-    delay(10000);
+    delay(10000);*/
 }
 
