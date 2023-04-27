@@ -7,12 +7,15 @@
 
 #include "src/userUsbCdc/USBCDC.h"
 #include "ch446q_driver.h"
+#include "pinUtil.h"
 #include "util.h"
 
 char rxSerialBuffer[16];
 uint8_t rxSerialBufferPtr = 0;
 
 void setup() {
+  CH552_power(true);
+
   USBInit();
   CH446Q_init();
   CH446Q_reset();
@@ -23,7 +26,7 @@ void setup() {
   CH446Q_switch_channel(7, 4, true);
 
   analogWrite(25, 64);
-
+//CH552_enter_bootloader();
   //delay(100);
   //CH446Q_reset();
   
@@ -69,6 +72,12 @@ void loop() {
               }
 
             }
+          case 'B':
+            if (rxSerialBufferPtr == 1) {
+              USBSerial_println("B: CH552 boot mode");
+              CH446Q_reset();
+            }
+            break;
           default:
             break;
         }
@@ -88,12 +97,16 @@ void loop() {
 
   USBSerial_flush();
 
-analogWrite(12,64);
-  analogWrite(25, 64);
-delay(100);
-digitalWrite(12,128);
-  digitalWrite(25, LOW);
-  delay(100);
+//analogWrite(12,64);
+  //analogWrite(25, 64);
+ // CH552_POWER(true);
+ // CH446Q_reset();
+//delay(2000);
+//digitalWrite(12,128);
+  //digitalWrite(25, LOW);
+ // CH552_POWER(false);
+ // CH446Q_reset();
+ // delay(2000);
 
   /*CH446Q_switch_channel(10,7,false);
     CH446Q_switch_channel(11,7,true);
@@ -101,4 +114,13 @@ digitalWrite(12,128);
     CH446Q_switch_channel(10,7,true);
     CH446Q_switch_channel(11,7,false);
     delay(3000);*/
+
+  CH552_enter_bootloader();
+    delay(10000);
+    CH446Q_reset();
+    CH552_power(0); 
+    delay(10);
+    CH552_power(1); 
+    delay(10000);
 }
+
