@@ -42,9 +42,9 @@ void loop() {
         //USBSerial_println(rxSerialBuffer);
         switch (rxSerialBuffer[0])
         {
-          case 'R':
+          case 'I':
             if (rxSerialBufferPtr == 1) {
-              USBSerial_println("R: Reset System");
+              USBSerial_println("I: Init System");
               CH446Q_reset();
             }
             break;
