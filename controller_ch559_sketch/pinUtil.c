@@ -43,13 +43,21 @@ uint8_t checkPinValid(__data uint8_t pin){
     return 0;
 }
 
+void restoreAllPins(){
+    for (__data uint8_t i=0;i<7;i++){
+        restorePin(validPins[i]);
+    }
+}
+
 void restorePin(__data uint8_t pin){
     if ( (pin == 2) || (pin == 3) ){    //RXD_ TXD_
         return ;
     }else if ( (pin == 26) || (pin == 27) ){  //RXD1 TXD1
         return ;
-    }else if ( (pin == 25) ){  //T2EX
-        return ;
+    }else if ( (pin == 25) ){  //T2EX,PWM2
+        digitalRead(25);
+    }else if ( (pin == 12) ){  //PWM3
+        digitalRead(12);
     }
     return;
 }
