@@ -82,3 +82,21 @@ uint8_t writePin(__data uint8_t pin, __xdata uint8_t value){
         return PIN_ERROR;
     }
 }
+
+uint8_t fastPWM3(__data uint8_t value){
+    P1_DIR |= bPWM3;    //push pull
+    P1_PU |= bPWM3;
+    PIN_FUNC &= ~bTMR3_PIN_X;
+    T3_CTRL |= bT3_CLR_ALL;   
+    T3_CTRL &= ~bT3_CLR_ALL;
+    T3_SETUP |= bT3_EN_CK_SE;
+    T3_CK_SE_L = (F_CPU/(20000L*255)) & 0xFF;
+    T3_CK_SE_H = ((F_CPU/(20000L*255))>>8) & 0xFF;
+    T3_SETUP &= ~bT3_EN_CK_SE;
+    T3_CTRL |= bT3_OUT_EN;
+    T3_END_L = 0xff;
+    T3_END_H = 0;
+    T3_FIFO_L = value;
+    T3_FIFO_H = 0;
+    T3_CTRL |= bT3_CNT_EN ;
+}
