@@ -62,6 +62,20 @@ void restorePin(__data uint8_t pin){
     return;
 }
 
+void disableUART0(){
+    //just map it back to non-exising pin, on CH552, Serial0_begin does not affect TX RX as out at least
+    PIN_FUNC&=~bUART0_PIN_X; //on CH559, PIN_FUNC|=bUART0_PIN_X will set P0.2/P0.3 to UART0 alone
+    TR1 = 0; 
+    TI = 0;
+    REN = 0;                                                              
+    ES = 0;    
+}
+void disableUART1(){
+    SER1_IER = 0;     
+    SER1_MCR = 0;
+    IE_UART1 = 0;
+}
+
 uint8_t readPin(__data uint8_t pin){
     if (checkPinValid(pin)){
         restorePin(pin);
