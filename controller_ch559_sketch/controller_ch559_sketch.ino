@@ -12,6 +12,8 @@
 
 char rxSerialBuffer[16];
 uint8_t rxSerialBufferPtr = 0;
+uint8_t digitalPinSubscribed = 255;
+uint32_t digitalPinSubscribedLastPrintTime = 0;
 
 void setup() {
   CH552_power(true);
@@ -25,7 +27,7 @@ void setup() {
   CH446Q_switch_channel(9, 3, true);
   CH446Q_switch_channel(7, 4, true);
 
-  analogWrite(25, 64);
+//  analogWrite(25, 64);
 //CH552_enter_bootloader();
   //delay(100);
   //CH446Q_reset();
@@ -44,8 +46,9 @@ void loop() {
         {
           case 'I':
             if (rxSerialBufferPtr == 1) {
-              USBSerial_println("I: Init System");
+              USBSerial_println("I:Init System");
               CH446Q_reset();
+              digitalPinSubscribed = 255;
             }
             break;
           case 'C':
@@ -58,7 +61,7 @@ void loop() {
 
               if ( (xChannel < 16) && (yChannel < 8)) {
                 USBSerial_print(rxSerialBuffer[0]);
-                USBSerial_print(": Turn ");
+                USBSerial_print(":Turn ");
                 if (onOFF == 1) {
                   USBSerial_print("ON");
                 } else {
@@ -84,6 +87,30 @@ void loop() {
               CH552_reboot_usercode();
             }
             break;
+          case 'R':
+          case 'r':
+            if (rxSerialBufferPtr == 3) {
+              uint8_t pinChannel = hexToUchar(rxSerialBuffer[1]);
+              uint8_t pinNumber = hexToUchar(rxSerialBuffer[2]);
+              uint8_t pinStatus = readPin(pinChannel*10+pinNumber);
+              USBSerial_print(rxSerialBuffer[0]);
+              USBSerial_print(rxSerialBuffer[1]);
+              USBSerial_print(rxSerialBuffer[2]);
+              USBSerial_print((char)':');
+              if (pinStatus==PIN_ERROR){
+                USBSerial_println("not valid");
+              }else{
+                USBSerial_println((char)('0'+pinStatus));
+                if (rxSerialBuffer[0] == 'R') {
+                  digitalPinSubscribed = 255;
+                }else{
+                  digitalPinSubscribed = pinChannel*10+pinNumber;
+                  digitalPinSubscribedLastPrintTime = millis();
+                }
+              }
+            }
+            break;
+          
           default:
             break;
         }
@@ -100,8 +127,22 @@ void loop() {
     }
   }
 
-
   USBSerial_flush();
+
+  if (digitalPinSubscribed!=255){
+    if (((int)(millis()-digitalPinSubscribedLastPrintTime))>25){
+      uint8_t pinStatus = readPin(digitalPinSubscribed);
+      USBSerial_print((char)'r');
+      if (pinStatus<0){
+        USBSerial_print((char)'0');
+      }
+      USBSerial_print((int)digitalPinSubscribed);
+      USBSerial_print((char)':');
+      USBSerial_println((char)('0'+pinStatus));
+      digitalPinSubscribedLastPrintTime = millis();
+    }
+  }
+
 
 //analogWrite(12,64);
   //analogWrite(25, 64);

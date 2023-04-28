@@ -1,6 +1,6 @@
 #include "util.h"
 
-uint8_t hexToUchar(char s) {
+uint8_t hexToUchar(__data char s) {
   if (s >= '0' && s <= '9') {
     return (s - '0');
   }

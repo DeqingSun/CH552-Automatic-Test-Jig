@@ -1,7 +1,7 @@
 {
     "configuration": "clock=24external,usb_settings=user148",
     "board": "CH55xDuino:mcs51:ch559",
-    "port": "/dev/tty.usbmodemCH55x1",
+    "port": "/dev/tty.usbmodemCH559_jig1",
     "sketch": "controller_ch559_sketch.ino",
     "output": "../ArduinoOutput"
 }

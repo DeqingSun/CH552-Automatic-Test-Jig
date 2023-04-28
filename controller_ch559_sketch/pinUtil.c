@@ -1,7 +1,9 @@
 #include "pinUtil.h"
 #include "ch446q_driver.h"
 
-void CH552_power(uint8_t on_off){
+__code uint8_t validPins[] = {02,03,12,25,26,27,32};
+
+void CH552_power(__data uint8_t on_off){
     if (on_off){
         pinMode(CH552_PMOS_PIN, OUTPUT);
         digitalWrite(CH552_PMOS_PIN, LOW);
@@ -30,4 +32,34 @@ void CH552_reboot_usercode(){
     CH552_power(0); //cut power to CH552
     delay(CH552_REBOOT_POWEDOWN_TIME);
     CH552_power(1); 
+}
+
+uint8_t checkPinValid(__data uint8_t pin){
+    for (__data uint8_t i=0;i<7;i++){
+        if (pin == validPins[i]){
+            return 1;
+        }
+    }
+    return 0;
+}
+
+void restorePin(__data uint8_t pin){
+    if ( (pin == 2) || (pin == 3) ){    //RXD_ TXD_
+        return ;
+    }else if ( (pin == 26) || (pin == 27) ){  //RXD1 TXD1
+        return ;
+    }else if ( (pin == 25) ){  //T2EX
+        return ;
+    }
+    return;
+}
+
+uint8_t readPin(__data uint8_t pin){
+    if (checkPinValid(pin)){
+        pinMode(pin, INPUT);
+        return digitalRead(pin);
+    }else{
+        return PIN_ERROR;
+    }
+    
 }
