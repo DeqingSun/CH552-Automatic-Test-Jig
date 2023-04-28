@@ -90,9 +90,8 @@ void loop() {
           case 'R':
           case 'r':
             if (rxSerialBufferPtr == 3) {
-              uint8_t pinChannel = hexToUchar(rxSerialBuffer[1]);
-              uint8_t pinNumber = hexToUchar(rxSerialBuffer[2]);
-              uint8_t pinStatus = readPin(pinChannel*10+pinNumber);
+              uint8_t pin = hexToUchar(rxSerialBuffer[1])*10+hexToUchar(rxSerialBuffer[2]);
+              uint8_t pinStatus = readPin(pin);
               USBSerial_print(rxSerialBuffer[0]);
               USBSerial_print(rxSerialBuffer[1]);
               USBSerial_print(rxSerialBuffer[2]);
@@ -104,13 +103,31 @@ void loop() {
                 if (rxSerialBuffer[0] == 'R') {
                   digitalPinSubscribed = 255;
                 }else{
-                  digitalPinSubscribed = pinChannel*10+pinNumber;
+                  digitalPinSubscribed = pin;
                   digitalPinSubscribedLastPrintTime = millis();
                 }
               }
             }
             break;
-          
+          case 'W':
+          case 'w':
+            if (rxSerialBufferPtr == 4) {
+              uint8_t pin = hexToUchar(rxSerialBuffer[1])*10+hexToUchar(rxSerialBuffer[2]);
+              uint8_t value = hexToUchar(rxSerialBuffer[3]);
+              USBSerial_print(rxSerialBuffer[0]);
+              USBSerial_print(rxSerialBuffer[1]);
+              USBSerial_print(rxSerialBuffer[2]);
+              USBSerial_print((char)':');
+              if ((rxSerialBuffer[0] == 'W') && (value<=1)){
+                uint8_t pinStatus = writePin(pin,value);
+                if (pinStatus==PIN_ERROR){
+                  USBSerial_println("not valid");
+                }else{
+                  USBSerial_println((char)('0'+pinStatus));
+                }
+              }
+            }
+            break;
           default:
             break;
         }

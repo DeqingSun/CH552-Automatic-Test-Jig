@@ -15,5 +15,6 @@ void CH552_reboot_usercode();
 uint8_t checkPinValid(__data uint8_t pin);
 void restorePin(__data uint8_t pin);
 uint8_t readPin(__data uint8_t pin);
+uint8_t writePin(__data uint8_t pin, __xdata uint8_t value);
 
 #endif

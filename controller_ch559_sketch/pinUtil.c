@@ -56,10 +56,21 @@ void restorePin(__data uint8_t pin){
 
 uint8_t readPin(__data uint8_t pin){
     if (checkPinValid(pin)){
+        restorePin(pin);
         pinMode(pin, INPUT);
         return digitalRead(pin);
     }else{
         return PIN_ERROR;
     }
-    
+}
+
+uint8_t writePin(__data uint8_t pin, __xdata uint8_t value){
+    if (checkPinValid(pin)){
+        restorePin(pin);
+        pinMode(pin, OUTPUT);
+        digitalWrite(pin, value);
+        return value;
+    }else{
+        return PIN_ERROR;
+    }
 }
