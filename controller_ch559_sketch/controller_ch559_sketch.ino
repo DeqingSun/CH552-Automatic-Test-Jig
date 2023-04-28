@@ -160,6 +160,52 @@ void loop() {
               }
             }
             break;
+          case 'T':
+          case 't':
+            //set uart baudrate
+            if (rxSerialBufferPtr == 2) {
+              uint8_t baudrateMuliplexer = hexToUchar(rxSerialBuffer[1]);
+              USBSerial_print(rxSerialBuffer[0]);
+              USBSerial_print((char)':');
+              if (baudrateMuliplexer==0){
+                USBSerial_println("disable UART");
+                //todo end serial
+              }else if (baudrateMuliplexer>(115200/9600)){
+                USBSerial_println("not valid rate");
+              }else{
+                __xdata uint32_t baudrate = 9600L*baudrateMuliplexer;
+                if (rxSerialBuffer[0] == 'T') {
+                  PIN_FUNC|=bUART0_PIN_X; 
+                  Serial0_begin(baudrate);  //RXD0/TXD0 uses P0.2/P0.3
+                }else{
+                  Serial1_begin(baudrate);
+                }
+                USBSerial_println(baudrate);
+              }
+            }
+            break;
+          case 'U':
+          case 'u':
+            {
+              for (int i=1;i<rxSerialBufferPtr;i++){
+                __data char charToSend = rxSerialBuffer[i];
+                if (charToSend == '\\'){
+                  if (rxSerialBuffer[i+1] == 'n'){
+                    charToSend = '\n';
+                    i++;
+                  }else if (rxSerialBuffer[i+1] == 'r'){
+                    charToSend = '\r';
+                    i++;
+                  }
+                }
+                if (rxSerialBuffer[0] == 'U') {
+                  Serial0_write(charToSend);
+                }else{
+                  Serial1_write(charToSend);
+                }
+              }
+            }
+            break;
           default:
             break;
         }
