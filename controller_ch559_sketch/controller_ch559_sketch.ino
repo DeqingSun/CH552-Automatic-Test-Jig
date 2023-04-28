@@ -170,7 +170,7 @@ void loop() {
               if (baudrateMuliplexer==0){
                 USBSerial_println("disable UART");
                 if (rxSerialBuffer[0] == 'T') {
-                  //just map it back to non-exising pin
+                  //just map it back to non-exising pin, on CH552, Serial0_begin does not affect TX RX as out at least
                   PIN_FUNC&=~bUART0_PIN_X; //on CH559, PIN_FUNC|=bUART0_PIN_X will set P0.2/P0.3 to UART0 alone
                 }else{
                   
