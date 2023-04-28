@@ -169,6 +169,12 @@ void loop() {
               USBSerial_print((char)':');
               if (baudrateMuliplexer==0){
                 USBSerial_println("disable UART");
+                if (rxSerialBuffer[0] == 'T') {
+                  //just map it back to non-exising pin
+                  PIN_FUNC&=~bUART0_PIN_X; //on CH559, PIN_FUNC|=bUART0_PIN_X will set P0.2/P0.3 to UART0 alone
+                }else{
+                  
+                }
                 //todo end serial
               }else if (baudrateMuliplexer>(115200/9600)){
                 USBSerial_println("not valid rate");
@@ -178,7 +184,7 @@ void loop() {
                   PIN_FUNC|=bUART0_PIN_X; 
                   Serial0_begin(baudrate);  //RXD0/TXD0 uses P0.2/P0.3
                 }else{
-                  Serial1_begin(baudrate);
+                  Serial1_begin(baudrate);  //RXD1/TXD1 uses P2.6/P2.7
                 }
                 USBSerial_println(baudrate);
               }
