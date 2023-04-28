@@ -47,6 +47,8 @@ void restoreAllPins(){
     for (__data uint8_t i=0;i<7;i++){
         restorePin(validPins[i]);
     }
+    disableUART0();
+    disableUART1();
 }
 
 void restorePin(__data uint8_t pin){
