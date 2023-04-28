@@ -23,6 +23,7 @@ void setup() {
   USBInit();
   CH446Q_init();
   CH446Q_reset();
+
 }
 
 void loop() {
@@ -224,6 +225,41 @@ void loop() {
         rxSerialBuffer[rxSerialBufferPtr] = '\0';
       }
     }
+  }
+
+  if (Serial0_available()){
+    USBSerial_write((char)'U');
+    USBSerial_write((char)':');
+    while (Serial0_available()) {
+      __data char serialChar = Serial0_read();
+      if (serialChar == '\n') {
+        USBSerial_write((char)'\\');
+        USBSerial_write((char)'n');
+      }else if (serialChar == '\r'){
+        USBSerial_write((char)'\\');
+        USBSerial_write((char)'r');
+      }else{
+        USBSerial_write(serialChar);
+      }
+    }
+    USBSerial_write((char)'\n');
+  }
+  if (Serial1_available()){
+    USBSerial_write((char)'u');
+    USBSerial_write((char)':');
+    while (Serial1_available()) {
+      __data char serialChar = Serial1_read();
+      if (serialChar == '\n') {
+        USBSerial_write((char)'\\');
+        USBSerial_write((char)'n');
+      }else if (serialChar == '\r'){
+        USBSerial_write((char)'\\');
+        USBSerial_write((char)'r');
+      }else{
+        USBSerial_write(serialChar);
+      }
+    }
+    USBSerial_write((char)'\n');
   }
 
   USBSerial_flush();
