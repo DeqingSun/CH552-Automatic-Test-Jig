@@ -46,8 +46,8 @@ __code uint16_t SerDes[]={                                 //Serial String Descr
 };
 __code uint16_t SerDesLen = sizeof(SerDes);
 __code uint16_t Prod_Des[]={                                //Produce String Descriptor
-    0x0316,
-    'C','H','5','5','x','d','u','i','n','o',
+    0x031E,
+    'C','H','5','5','x','d','u','i','n','o',' ','j','i','g'
 };
 __code uint16_t Prod_DesLen = sizeof(Prod_Des);
 
