@@ -23,6 +23,7 @@ void setup() {
   USBInit();
   CH446Q_init();
   CH446Q_reset();
+
 }
 
 void loop() {
@@ -160,6 +161,56 @@ void loop() {
               }
             }
             break;
+          case 'T':
+          case 't':
+            //set uart baudrate
+            if (rxSerialBufferPtr == 2) {
+              uint8_t baudrateMuliplexer = hexToUchar(rxSerialBuffer[1]);
+              USBSerial_print(rxSerialBuffer[0]);
+              USBSerial_print((char)':');
+              if (baudrateMuliplexer==0){
+                USBSerial_println("disable UART");
+                if (rxSerialBuffer[0] == 'T') {
+                  disableUART0();                                                                 
+                }else{
+                  disableUART1();
+                }
+              }else if (baudrateMuliplexer>(115200/9600)){
+                USBSerial_println("not valid rate");
+              }else{
+                __xdata uint32_t baudrate = 9600L*baudrateMuliplexer;
+                if (rxSerialBuffer[0] == 'T') {
+                  PIN_FUNC|=bUART0_PIN_X; 
+                  Serial0_begin(baudrate);  //RXD0/TXD0 uses P0.2/P0.3
+                }else{
+                  Serial1_begin(baudrate);  //RXD1/TXD1 uses P2.6/P2.7
+                }
+                USBSerial_println(baudrate);
+              }
+            }
+            break;
+          case 'U':
+          case 'u':
+            {
+              for (int i=1;i<rxSerialBufferPtr;i++){
+                __data char charToSend = rxSerialBuffer[i];
+                if (charToSend == '\\'){
+                  if (rxSerialBuffer[i+1] == 'n'){
+                    charToSend = '\n';
+                    i++;
+                  }else if (rxSerialBuffer[i+1] == 'r'){
+                    charToSend = '\r';
+                    i++;
+                  }
+                }
+                if (rxSerialBuffer[0] == 'U') {
+                  Serial0_write(charToSend);
+                }else{
+                  Serial1_write(charToSend);
+                }
+              }
+            }
+            break;
           default:
             break;
         }
@@ -174,6 +225,41 @@ void loop() {
         rxSerialBuffer[rxSerialBufferPtr] = '\0';
       }
     }
+  }
+
+  if (Serial0_available()){
+    USBSerial_write((char)'U');
+    USBSerial_write((char)':');
+    while (Serial0_available()) {
+      __data char serialChar = Serial0_read();
+      if (serialChar == '\n') {
+        USBSerial_write((char)'\\');
+        USBSerial_write((char)'n');
+      }else if (serialChar == '\r'){
+        USBSerial_write((char)'\\');
+        USBSerial_write((char)'r');
+      }else{
+        USBSerial_write(serialChar);
+      }
+    }
+    USBSerial_write((char)'\n');
+  }
+  if (Serial1_available()){
+    USBSerial_write((char)'u');
+    USBSerial_write((char)':');
+    while (Serial1_available()) {
+      __data char serialChar = Serial1_read();
+      if (serialChar == '\n') {
+        USBSerial_write((char)'\\');
+        USBSerial_write((char)'n');
+      }else if (serialChar == '\r'){
+        USBSerial_write((char)'\\');
+        USBSerial_write((char)'r');
+      }else{
+        USBSerial_write(serialChar);
+      }
+    }
+    USBSerial_write((char)'\n');
   }
 
   USBSerial_flush();
