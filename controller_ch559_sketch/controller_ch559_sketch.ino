@@ -24,6 +24,22 @@ void setup() {
   CH446Q_init();
   CH446Q_reset();
 
+//!!!!!
+fastPWM3(128);
+
+P1_DIR =0;
+    P1_PU =0;
+
+    T3_CTRL = 0;
+    T3_SETUP = 0;
+
+
+restoreAllPins();
+
+  CH446Q_switch_channel(CH446_X_CH552_P34,CH446_Y_CH559_P12_RC,1);
+CH446Q_switch_channel(CH446_X_EXT_LED_10,CH446_Y_CH559_P12_RC,1);
+//!!!!!
+
 }
 
 void loop() {
@@ -293,4 +309,3 @@ void loop() {
   }
   
 }
-
