@@ -75,7 +75,20 @@ if need_to_build:
 
     #print(example_directories)
     for example_directory in example_directories:
+        board_options_string = ""
+        sketch_file = os.path.join(example_directory, os.path.basename(example_directory)+".ino")
+        #check if there is a line in the sketch file that contains "cli board options:"
+        if os.path.isfile(sketch_file):
+            with open(sketch_file, 'r') as fp:
+                lines = fp.readlines()
+                for row in lines:
+                    if row.find('cli board options:') != -1:
+                        board_options_string = '--board-options '+row.replace('cli board options:', '').strip()
+                        break
+
         build_cmd = f"{arduino_cli_path} compile --fqbn CH55xDuino:mcs51:ch552 --build-path {arduino_build_directory} --build-cache-path {arduino_core_build_directory} {example_directory}"
+        if board_options_string != "":
+            build_cmd = build_cmd + " " + board_options_string
         example_name = os.path.basename(example_directory)
         print(f"Building {example_name}")
         build_start_time = time.monotonic()
