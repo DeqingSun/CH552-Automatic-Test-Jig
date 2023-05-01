@@ -2,6 +2,7 @@ import yaml
 import os
 import subprocess
 import time
+import shutil
 
 need_to_build = False
 need_to_test = True
@@ -49,9 +50,17 @@ if not os.path.isdir(test_script_directory):
 
 if need_to_build:
     #clear folders
-    os.system(f"rm -rf folder {os.path.join(arduino_build_directory, '*')}")
-    os.system(f"rm -rf folder {os.path.join(arduino_core_build_directory, '*')}")
-    os.system(f"rm -rf folder {os.path.join(batch_build_directory, '*')}")
+    folders_to_clear = [arduino_build_directory, arduino_core_build_directory, batch_build_directory]
+    for folder in folders_to_clear:
+        for filename in os.listdir(folder):
+            file_path = os.path.join(folder, filename)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print('Failed to delete %s. Reason: %s' % (file_path, e))
     #iterate every sub folder in the example_search_directory
     example_directories = []
     for subdir, dirs, files in os.walk(example_search_directory):
@@ -79,7 +88,7 @@ if need_to_build:
             print(f"Build of {example_name} completed in {build_time:.2f} seconds")
             hex_path = os.path.join(arduino_build_directory, example_name+".ino.hex")
             if os.path.isfile(hex_path):
-                os.system(f"cp {hex_path} {batch_build_directory}")
+                shutil.copy(hex_path, batch_build_directory)
             else:
                 print(f"Hex file not found at {hex_path}")
         else:
