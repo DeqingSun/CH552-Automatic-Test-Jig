@@ -37,7 +37,7 @@ class CH559_jig:
     def connect(self):
         ch559_port = None
         for port in serial.tools.list_ports.comports():
-            if (port.serial_number == "CH559 jig"):
+            if ((port.serial_number == "CH559 jig") or (port.serial_number == "CH559_JIG")):
                 ch559_port = port
                 break
         if (ch559_port == None):

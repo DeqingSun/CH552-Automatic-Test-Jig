@@ -141,6 +141,7 @@ if need_to_test:
         del ch559_jig
         #use vnproch55x to upload the hex file
         upload_process = subprocess.Popen([upload_tool_path,"-r","2",hex_file], stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = upload_process.communicate() 
         return_code = upload_process.wait()
         if return_code == 0:
             print(f"Upload of {hex_file} completed")

@@ -13,7 +13,7 @@ class CH552_serial_code:
         start_time = time.monotonic()
         while ( (time.monotonic() - start_time < retry_time) and (ch552_port == None) ):
             for port in serial.tools.list_ports.comports():
-                if ( (port.serial_number == "CH55x") and (port.product == "CH55xduino") ):
+                if ( ((port.serial_number == "CH55x") and (port.product == "CH55xduino")) or (port.serial_number == "CH55X")):
                     ch552_port = port
                     break
 
