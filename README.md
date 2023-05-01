@@ -10,6 +10,10 @@ Most regression tests are limited to the software level. For most of the continu
 
 ## How does it work
 
+A raspberry pi computer runs a script to compile every Arduino example of CH55xduino. For each of the Arduino examples, the pi connects to a test jig board to restart the target CH552 chip into bootloader mode and upload the compiled hex file. Then the pi will use the corresponding test script to test the behavior of the hex file, with the CH559 and switch matrix chip on the test jig board. 
+
+The CH559 can do digital/analog read/write to the target CH552 chip. The pi can do the USB communication. Then the raspberry pi will be able to test if the hex works in a way matches the defination in the test script. 
+
 ## Hardware
 
 ## Software
