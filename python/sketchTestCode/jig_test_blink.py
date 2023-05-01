@@ -8,9 +8,9 @@ if (not ch559_jig.initailize(wait_for_input_time=1)):
     print("CH559 jig initailize failed")
     exit(1)
 
-ch559_jig.connectPins(ch559_jig.PIN_CH552_P33_X,ch559_jig.PIN_CH559_P25, wait_for_input_time=1)
-ch559_jig.connectPins(ch559_jig.PIN_EXT_LED_10_X,ch559_jig.PIN_CH559_P25, wait_for_input_time=1)
-pin_value = ch559_jig.digitalPinSubscribe(25, wait_for_input_time=1)
+ch559_jig.connect_pins(ch559_jig.PIN_CH552_P33_X,ch559_jig.PIN_CH559_P25, wait_for_input_time=1)
+ch559_jig.connect_pins(ch559_jig.PIN_EXT_LED_10_X,ch559_jig.PIN_CH559_P25, wait_for_input_time=1)
+pin_value = ch559_jig.digital_pin_subscribe(25, wait_for_input_time=1)
 
 #measure toggle time
 start_time = time.monotonic()
@@ -19,9 +19,9 @@ pin_toggle_time = time.monotonic()
 toggle_duration_history = []
 toggle_duration_verified = False
 while ( (time.monotonic() - start_time < 10) and (not toggle_duration_verified) ):
-    pin_value = ch559_jig.checkDigitalPinSubscription(25, wait_for_input_time=1)
+    pin_value = ch559_jig.check_digital_pin_subscription(25, wait_for_input_time=1)
     if (pin_value == None):
-        print("CH559 jig checkDigitalPinSubscription failed")
+        print("CH559 jig check_digital_pin_subscription failed")
         exit(1)
     if (prev_pin_value != pin_value):
         toggle_duration = time.monotonic() - pin_toggle_time

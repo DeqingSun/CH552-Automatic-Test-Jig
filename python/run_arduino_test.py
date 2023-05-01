@@ -3,7 +3,8 @@ import os
 import subprocess
 import time
 
-need_to_build = True
+need_to_build = False
+need_to_test = True
 
 with open("config.yaml", 'r') as stream:
     arduino_config = yaml.safe_load(stream)
@@ -78,3 +79,27 @@ if need_to_build:
             with open(error_log_file, 'a') as error_log:
                 error_log.write(f"===\nError building {example_name}\n")
                 error_log.write(err_string)
+
+if need_to_test:
+    #iterate every file in the batch_build_directory in date order
+    hex_files = []
+    for subdir, dirs, files in os.walk(batch_build_directory):
+        for file in files:
+            if file.endswith(".hex"):
+                hex_files.append(os.path.join(subdir, file))
+    hex_files.sort(key=os.path.getmtime)
+    #for debug purposes
+    hex_files = [hex_files[2]]
+    for hex_file in hex_files:
+        print(f"Now testing {hex_file}")
+        #use ch559_jig_code to reboot the CH552 into bootloader mode
+        from sketchTestCode.ch559_jig_code import CH559_jig
+        ch559_jig = CH559_jig()
+        ch559_jig.connect()
+        if (not ch559_jig.enter_bootloader_mode()):
+            print("CH559 jig enter_bootloader_mode failed")
+            exit(1)
+        ch559_jig.disconnect()
+        del ch559_jig
+        
+        

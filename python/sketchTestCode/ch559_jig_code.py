@@ -59,7 +59,7 @@ class CH559_jig:
         self.serial_port.close()
         self.serial_port = None
 
-    def checkInput(self):
+    def check_input(self):
         return_list = []
         if (self.serial_port == None):
             return return_list
@@ -93,7 +93,7 @@ class CH559_jig:
             start_time = time.monotonic()
             while (time.monotonic() - start_time < wait_for_input_time):
                 time.sleep(0.001)
-                response = self.checkInput()
+                response = self.check_input()
                 if (len(response) > 0):
                     for line in response:
                         if string_to_wait in line:
@@ -108,7 +108,7 @@ class CH559_jig:
         else:
             return (len(write_response)>0)
 
-    def connectPins(self, pin_CH552, pin_CH559, wait_for_input_time=0):
+    def connect_pins(self, pin_CH552, pin_CH559, wait_for_input_time=0):
         command = f"C{pin_CH552:X}{pin_CH559:X}\n"
         write_response = self.write_string_wait_for_response(command, "C:", wait_for_input_time)
         if (wait_for_input_time == 0):
@@ -116,7 +116,7 @@ class CH559_jig:
         else:
             return (len(write_response)>0)
         
-    def digitalPinSubscribe(self, pin, wait_for_input_time=0):
+    def digital_pin_subscribe(self, pin, wait_for_input_time=0):
         command = f"r{pin:02d}\n"
         responseHeader = f"r{pin:02d}:"
         write_response = self.write_string_wait_for_response(command, responseHeader, wait_for_input_time)
@@ -132,7 +132,7 @@ class CH559_jig:
             else:
                 return None
     
-    def checkDigitalPinSubscription(self, pin, wait_for_input_time=0):
+    def check_digital_pin_subscription(self, pin, wait_for_input_time=0):
         command = ""
         responseHeader = f"r{pin:02d}:"
         write_response = self.write_string_wait_for_response(command, responseHeader, wait_for_input_time)
@@ -147,3 +147,16 @@ class CH559_jig:
                     return None
             else:
                 return None
+            
+    def enter_bootloader_mode(self):
+        #force wait
+        if self.initailize(wait_for_input_time=1) == False:
+            return False
+        command = "B\n"
+        write_response = self.write_string_wait_for_response(command, "B:", 1)
+        if (len(write_response)==0):
+            return False
+        time.sleep(0.05)
+        if self.initailize(wait_for_input_time=1) == False:
+            return False
+        return True
