@@ -3,3 +3,4 @@ arduino_build_directory : /home/pi/arduino_build
 arduino_core_build_directory : /home/pi/arduino_build_core
 example_search_directory : /home/pi/ch55xduino/ch55xduino/ch55x/libraries/Generic_Examples/examples
 error_log_file : /home/pi/ch559jigPython/arduino_example_build_error.log
+batch_build_directory : /home/pi/batch_build
