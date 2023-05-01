@@ -27,9 +27,15 @@ for test_pwm_value in test_pwm_values:
     if (len(return_list) == 0):
         print("CH552 serial no input")
         exit(1)
-    last_return_string = return_list[-1].strip()
-    adc_value = int(last_return_string)
-    if (abs(adc_value - ch552_calculated_read_value) > 10):
+
+    average_samples = min(4,len(return_list))
+    sum = 0
+    for i in range(average_samples):
+        return_string = return_list[-1-i].strip()
+        sum = sum + int(return_string)
+    adc_value = sum/average_samples
+
+    if (abs(adc_value - ch552_calculated_read_value) > 5):
         print(f"CH552 serial ADC value {adc_value} not match calculated value {ch552_calculated_read_value}")
         exit(1)
 
