@@ -36,6 +36,16 @@ if not os.path.isdir(example_search_directory):
     exit(1)
 error_log_file = arduino_config['error_log_file']
 print(f"Using error log file at {error_log_file}")
+upload_tool_path = arduino_config['upload_tool_path']
+print(f"Using upload tool path at {upload_tool_path}")
+if not os.path.isfile(upload_tool_path):
+    print(f"upload tool not found at {upload_tool_path}")
+    exit(1)
+test_script_directory = arduino_config['test_script_directory']
+print(f"Using test script directory at {test_script_directory}")
+if not os.path.isdir(test_script_directory):
+    print(f"test script directory not found at {test_script_directory}")
+    exit(1)
 
 if need_to_build:
     #clear folders
@@ -91,6 +101,12 @@ if need_to_test:
     #for debug purposes
     hex_files = [hex_files[2]]
     for hex_file in hex_files:
+        #find corresponding test script
+        hex_sketch_name = os.path.basename(hex_file).split(".")[0]
+        test_script_path = os.path.join(test_script_directory, "jig_test_"+hex_sketch_name+".py")
+        if not os.path.isfile(test_script_path):
+            print(f"Test script not found at {test_script_path} for {hex_sketch_name}")
+            continue
         print(f"Now testing {hex_file}")
         #use ch559_jig_code to reboot the CH552 into bootloader mode
         from sketchTestCode.ch559_jig_code import CH559_jig
@@ -101,5 +117,24 @@ if need_to_test:
             exit(1)
         ch559_jig.disconnect()
         del ch559_jig
+        #use vnproch55x to upload the hex file
+        upload_process = subprocess.Popen([upload_tool_path,"-r","2",hex_file], stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return_code = upload_process.wait()
+        if return_code == 0:
+            print(f"Upload of {hex_file} completed")
+        else:
+            print(f"Error uploading {hex_file}")
+            with open(error_log_file, 'a') as error_log:
+                error_log.write(f"Error uploading {hex_file}\n")
+            exit(1)
+        test_process = subprocess.Popen(["python",test_script_path], stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return_code = upload_process.wait()
+        if return_code == 0:
+            print(f"Test of {hex_file} completed")
+        else:
+            print(f"Error testing {hex_file}")
+            with open(error_log_file, 'a') as error_log:
+                error_log.write(f"Error testing {hex_file}\n")
         
+
         
