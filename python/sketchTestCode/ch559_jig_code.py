@@ -148,6 +148,18 @@ class CH559_jig:
             else:
                 return None
             
+    def analog_write(self, pin, value, wait_for_input_time=0):
+        command = f"w{pin:02d}{value:02x}\n"
+        write_response = self.write_string_wait_for_response(command, f"w{pin:02d}:", wait_for_input_time)
+        if (wait_for_input_time == 0):
+            return True
+        else:
+            if (len(write_response)==0):
+                return False
+            if ("not valid" in write_response):
+                return False
+            return True
+            
     def enter_bootloader_mode(self):
         #force wait
         if self.initailize(wait_for_input_time=1) == False:
@@ -160,3 +172,4 @@ class CH559_jig:
         if self.initailize(wait_for_input_time=1) == False:
             return False
         return True
+    
