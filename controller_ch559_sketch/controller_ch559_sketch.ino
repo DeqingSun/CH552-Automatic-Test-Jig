@@ -155,7 +155,7 @@ void loop() {
                 }else{
                   fastPWM3(value);  //20K for P12
                 }
-                USBSerial_print((int)value);
+                USBSerial_println((int)value);
               }else{
                 USBSerial_println("not valid");
               }
