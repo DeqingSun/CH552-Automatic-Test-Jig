@@ -16,5 +16,9 @@ The CH559 can do digital/analog read/write to the target CH552 chip. The pi can 
 
 ## Hardware
 
+The circuit board of the test jig contains a CH559 chip that acts as a controller to do digital IO, serial communication, and makeshift analog IO with a T filter. The CH552 chip is mounted in an SMT Test Socket because the chip has low flash write cycles. The CH446Q switch matrix chip connects any CH552 pin to any CH559 function pin with great flexibility. Also, the CH559 can power cycle the CH552 chip with a MOSFET. So the CH552 can enter bootload mode safely.    
+
+The Raspberry Pi serves as the compiler and controller of the whole system. Raspberry Pi uses a USB cable to control the CH559 chip and another USB cable to control the target CH552 chip.
+
 ## Software
 
