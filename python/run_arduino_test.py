@@ -99,7 +99,7 @@ if need_to_test:
                 hex_files.append(os.path.join(subdir, file))
     hex_files.sort(key=os.path.getmtime)
     #for debug purposes
-    hex_files = [hex_files[0]]
+    hex_files = hex_files[0:5]
     for hex_file in hex_files:
         #find corresponding test script
         hex_sketch_name = os.path.basename(hex_file).split(".")[0]
@@ -128,13 +128,17 @@ if need_to_test:
                 error_log.write(f"Error uploading {hex_file}\n")
             exit(1)
         test_process = subprocess.Popen(["python",test_script_path], stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        return_code = upload_process.wait()
+        out, err = test_process.communicate() 
+        return_code = test_process.wait()
         if return_code == 0:
             print(f"Test of {hex_file} completed")
         else:
             print(f"Error testing {hex_file}")
+            print(out.decode('utf-8'))
+            print(err.decode('utf-8'))
             with open(error_log_file, 'a') as error_log:
                 error_log.write(f"Error testing {hex_file}\n")
+            exit(1)
         
 
         

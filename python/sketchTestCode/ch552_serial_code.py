@@ -8,15 +8,22 @@ class CH552_serial_code:
         self.serial_buffer = ""
         
 
-    def connect(self):
+    def connect(self, retry_time=2):
         ch552_port = None
-        for port in serial.tools.list_ports.comports():
-            if ( (port.serial_number == "CH55x") and (port.product == "CH55xduino") ):
-                ch552_port = port
-                break
+        start_time = time.monotonic()
+        while ( (time.monotonic() - start_time < retry_time) and (ch552_port == None) ):
+            for port in serial.tools.list_ports.comports():
+                if ( (port.serial_number == "CH55x") and (port.product == "CH55xduino") ):
+                    ch552_port = port
+                    break
+
         if (ch552_port == None):
             print("CH55xduino not found")
             return False
+        
+        #wait for the port to be ready, or there may be SerialException in opening
+        time.sleep(0.1)
+
         try:
             self.serial_port = serial.Serial(ch552_port.device, 115200, timeout=0)
         except Exception as e:
