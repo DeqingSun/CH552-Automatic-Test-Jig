@@ -142,7 +142,7 @@ class CH559_jig:
             if (len(write_response)>0):
                 try:
                     colon_pos = write_response.find(":")
-                    return (int(write_response[colon_pos+1])>0)
+                    return (int(write_response[colon_pos+1:]))
                 except:
                     return None
             else:
@@ -167,6 +167,22 @@ class CH559_jig:
     def check_analog_pin_subscription(self, pin, wait_for_input_time=0):
         command = ""
         responseHeader = f"a{pin:02d}:"
+        write_response = self.write_string_wait_for_response(command, responseHeader, wait_for_input_time)
+        if (wait_for_input_time == 0):
+            return None
+        else:
+            if (len(write_response)>0):
+                try:
+                    colon_pos = write_response.find(":")
+                    return (int(write_response[colon_pos+1:]))
+                except:
+                    return None
+            else:
+                return None
+    
+    def analog_read(self, pin, wait_for_input_time=0):
+        command = f"A{pin:02d}\n"
+        responseHeader = f"A{pin:02d}:"
         write_response = self.write_string_wait_for_response(command, responseHeader, wait_for_input_time)
         if (wait_for_input_time == 0):
             return None
