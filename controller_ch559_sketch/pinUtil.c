@@ -57,8 +57,10 @@ void restorePin(__data uint8_t pin){
     }else if ( (pin == 26) || (pin == 27) ){  //RXD1 TXD1
         return ;
     }else if ( (pin == 25) ){  //T2EX,PWM2
+        pinMode(25, INPUT);
         digitalRead(25);
     }else if ( (pin == 12) ){  //PWM3
+        pinMode(12, INPUT);
         digitalRead(12);
     }
     return;
