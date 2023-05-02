@@ -116,6 +116,14 @@ class CH559_jig:
         else:
             return (len(write_response)>0)
         
+    def disconnect_pins(self, pin_CH552, pin_CH559, wait_for_input_time=0):
+        command = f"c{pin_CH552:X}{pin_CH559:X}\n"
+        write_response = self.write_string_wait_for_response(command, "c:", wait_for_input_time)
+        if (wait_for_input_time == 0):
+            return True
+        else:
+            return (len(write_response)>0)
+        
     def digital_pin_subscribe(self, pin, wait_for_input_time=0):
         command = f"r{pin:02d}\n"
         responseHeader = f"r{pin:02d}:"

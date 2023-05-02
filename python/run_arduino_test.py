@@ -121,7 +121,7 @@ if need_to_test:
                 hex_files.append(os.path.join(subdir, file))
     hex_files.sort(key=os.path.getmtime)
     #for debug purposes
-    hex_files = hex_files[0:5]
+    hex_files = hex_files[14:15]
     for hex_file in hex_files:
         #find corresponding test script
         hex_sketch_name = os.path.basename(hex_file).split(".")[0]
