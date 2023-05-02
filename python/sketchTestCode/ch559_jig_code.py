@@ -207,6 +207,22 @@ class CH559_jig:
             if ("not valid" in write_response):
                 return False
             return True
+        
+    def digital_read(self, pin, wait_for_input_time=0):
+        command = f"R{pin:02d}\n"
+        responseHeader = f"R{pin:02d}:"
+        write_response = self.write_string_wait_for_response(command, responseHeader, wait_for_input_time)
+        if (wait_for_input_time == 0):
+            return None
+        else:
+            if (len(write_response)>0):
+                try:
+                    colon_pos = write_response.find(":")
+                    return (int(write_response[colon_pos+1])>0)
+                except:
+                    return None
+            else:
+                return None
             
     def enter_bootloader_mode(self):
         #force wait
