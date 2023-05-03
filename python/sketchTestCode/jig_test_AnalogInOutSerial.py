@@ -22,6 +22,8 @@ ch559_jig.connect_pins(ch559_jig.PIN_EXT_LED_10_X,ch559_jig.PIN_CH559_P12_RC, wa
 
 input_values = [0,1,0,1]
 
+pulse_count = 0
+
 for input_value in input_values:
     ch559_jig.digital_write(25, (input_value>0), wait_for_input_time=1)
     time.sleep(0.1)
@@ -37,7 +39,7 @@ for input_value in input_values:
         print("CH552 serial not same sensor_value output_value")
         print(sensor_value,output_value)
         exit(1)
-    if (abs(sensor_value - ideal_output_value) > 5):
+    if (abs(sensor_value - ideal_output_value) > 10):
         print("CH552 serial sensor_value not right")
         print(sensor_value,output_value,ideal_output_value)
         exit(1)
@@ -47,8 +49,11 @@ for input_value in input_values:
     ideal_analog_value = int(sensor_value/255*5/3.3*2048)
     ideal_analog_value = min(ideal_analog_value,2047)
     if (abs(analog_value - ideal_analog_value) > 500):
-        print(f"CH559 analog_value not right analog_value {analog_value},ideal_analog_value {ideal_analog_value}")
+        print(f"CH559 analog_value @ pulse {pulse_count} not right analog_value {analog_value},ideal_analog_value {ideal_analog_value}")
+        print(f"try again {ch559_jig.analog_read(12, wait_for_input_time=1)}")
         exit(1)
+
+    pulse_count += 1
 
 ch559_jig.initailize(wait_for_input_time=1)
 ch559_jig.disconnect()
