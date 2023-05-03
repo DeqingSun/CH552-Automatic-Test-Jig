@@ -47,6 +47,7 @@ print(f"Using test script directory at {test_script_directory}")
 if not os.path.isdir(test_script_directory):
     print(f"test script directory not found at {test_script_directory}")
     exit(1)
+print("======Get Started======")
 
 if need_to_build:
     #clear folders
