@@ -114,6 +114,7 @@ void loop() {
               if (pin!=12){
                 USBSerial_println("not valid");
               }else{
+                analogRead(pin);
                 USBSerial_println(analogRead(pin));
                 if (rxSerialBuffer[0] == 'A') {
                   analogPinSubscribed = 255;
@@ -287,6 +288,7 @@ void loop() {
       }
       USBSerial_print((int)analogPinSubscribed);
       USBSerial_print((char)':');
+      analogRead(analogPinSubscribed);
       USBSerial_println(analogRead(analogPinSubscribed));
       analogPinSubscribedLastPrintTime = millis();
     }
