@@ -31,7 +31,7 @@ if (digital_value != 0):
     print(f"CH552 serial digital value {digital_value} not match output value {0}")
     exit(1)
 
-ch559_jig.initailize(wait_for_input_time=1)
+ch559_jig.disconnect_pins(ch559_jig.PIN_CH552_P11_X,ch559_jig.PIN_CH559_P25, wait_for_input_time=1)
 
 time.sleep(0.1)
 return_list = ch552_serial_code.check_input()
