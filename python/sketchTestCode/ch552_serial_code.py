@@ -81,4 +81,8 @@ class CH552_serial_code:
                             return line
             return ""
     
+    def write_raw_value(self, raw_value):
+        if (self.serial_port == None):
+            return ""
+        self.serial_port.write(raw_value.to_bytes(1, byteorder='little'))
     

@@ -90,6 +90,7 @@ if need_to_build:
         build_cmd = f"{arduino_cli_path} compile --fqbn CH55xDuino:mcs51:ch552 --build-path {arduino_build_directory} --build-cache-path {arduino_core_build_directory} {example_directory}"
         if board_options_string != "":
             build_cmd = build_cmd + " " + board_options_string
+        #print(build_cmd)
         example_name = os.path.basename(example_directory)
         print(f"Building {example_name}")
         build_start_time = time.monotonic()
@@ -111,6 +112,7 @@ if need_to_build:
             print(f"Error building {example_name}")
             with open(error_log_file, 'a') as error_log:
                 error_log.write(f"===\nError building {example_name}\n")
+                error_log.write(build_cmd)
                 error_log.write(err_string)
 
 if need_to_test:
@@ -122,7 +124,7 @@ if need_to_test:
                 hex_files.append(os.path.join(subdir, file))
     hex_files.sort(key=os.path.getmtime)
     #for debug purposes
-    hex_files = hex_files[14:15]
+    hex_files = hex_files[20:21]
     test_index = 0
     for hex_file in hex_files:
         #find corresponding test script
