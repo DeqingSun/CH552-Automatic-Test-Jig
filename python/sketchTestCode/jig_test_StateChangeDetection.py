@@ -19,13 +19,13 @@ if (not ch559_jig.initailize(wait_for_input_time=1)):
 ch559_jig.digital_write(25, True, wait_for_input_time=1)
 ch552_state = 1 # 1 at beginning
 ch559_jig.connect_pins(ch559_jig.PIN_CH552_P11_X,ch559_jig.PIN_CH559_P25, wait_for_input_time=1)
-ch559_jig.connect_pins(ch559_jig.PIN_CH552_P33_X,ch559_jig.PIN_CH559_P26, wait_for_input_time=1)
+ch559_jig.connect_pins(ch559_jig.PIN_CH552_P33_X,ch559_jig.PIN_CH559_P32, wait_for_input_time=1)
 time.sleep(0.1)
 ch552_serial_code.check_input() # clear input
 
 test_digital_values = [False, True, False, True, False, True]
 for test_digital_value in test_digital_values:
-    led_value = ch559_jig.digital_read(26, wait_for_input_time=1)
+    led_value = ch559_jig.digital_read(32, wait_for_input_time=1)
     if (led_value != False):
         print(f"CH552 LED On on mistake")
         exit(1)
@@ -46,7 +46,7 @@ for test_digital_value in test_digital_values:
             print(f"CH552 serial not expected state {ch552_state} {res[0]}")
             exit(1)
         if (ch552_state == 4):
-            led_value = ch559_jig.digital_read(26, wait_for_input_time=1)
+            led_value = ch559_jig.digital_read(32, wait_for_input_time=1)
             if (led_value != True):
                 print(f"CH552 LED Off on mistake")
                 exit(1)
