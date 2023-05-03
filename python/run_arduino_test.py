@@ -122,6 +122,7 @@ if need_to_test:
     hex_files.sort(key=os.path.getmtime)
     #for debug purposes
     hex_files = hex_files[14:15]
+    test_index = 0
     for hex_file in hex_files:
         #find corresponding test script
         hex_sketch_name = os.path.basename(hex_file).split(".")[0]
@@ -129,7 +130,8 @@ if need_to_test:
         if not os.path.isfile(test_script_path):
             print(f"Test script not found at {test_script_path} for {hex_sketch_name}")
             continue
-        print(f"Now testing {hex_file}")
+        print(f"Now testing {test_index}/{len(hex_files)} {hex_file}")
+        start_time = time.monotonic()
         #use ch559_jig_code to reboot the CH552 into bootloader mode
         from sketchTestCode.ch559_jig_code import CH559_jig
         ch559_jig = CH559_jig()
@@ -144,7 +146,7 @@ if need_to_test:
         out, err = upload_process.communicate() 
         return_code = upload_process.wait()
         if return_code == 0:
-            print(f"Upload of {hex_file} completed")
+            print(f"Upload of {hex_file} completed after {time.monotonic()-start_time:.2f} seconds")
         else:
             print(f"Error uploading {hex_file}")
             with open(error_log_file, 'a') as error_log:
@@ -154,7 +156,7 @@ if need_to_test:
         out, err = test_process.communicate() 
         return_code = test_process.wait()
         if return_code == 0:
-            print(f"Test of {hex_file} completed")
+            print(f"Test of {hex_file} completed after {time.monotonic()-start_time:.2f} seconds")
         else:
             print(f"Error testing {hex_file}")
             print(out.decode('utf-8'))
@@ -162,6 +164,7 @@ if need_to_test:
             with open(error_log_file, 'a') as error_log:
                 error_log.write(f"Error testing {hex_file}\n")
             exit(1)
+        test_index = test_index + 1
         
 
         
