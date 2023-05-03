@@ -16,6 +16,8 @@ ch559_jig.connect_pins(ch559_jig.PIN_CH552_P32_X,ch559_jig.PIN_CH559_P25, wait_f
 
 ch559_jig.reboot_target()
 
+time.sleep(0.5)
+
 return_code = ch552_serial_code.connect()
 if (return_code != True):
     print("CH552 serial connect failed")

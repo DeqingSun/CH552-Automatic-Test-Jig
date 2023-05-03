@@ -263,14 +263,9 @@ class CH559_jig:
     
     def reboot_target(self):
         #force wait
-        if self.initailize(wait_for_input_time=1) == False:
-            return False
         command = "b\n"
         write_response = self.write_string_wait_for_response(command, "b:", 1)
         if (len(write_response)==0):
-            return False
-        time.sleep(0.05)
-        if self.initailize(wait_for_input_time=1) == False:
             return False
         return True
     
