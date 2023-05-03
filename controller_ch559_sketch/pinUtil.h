@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 #define CH552_PMOS_PIN 34
-#define CH552_REBOOT_POWEDOWN_TIME 10
+#define CH552_REBOOT_POWEDOWN_TIME 30
 
 #define PIN_ERROR 255
 

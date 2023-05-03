@@ -38,11 +38,11 @@ void loop() {
         {
           case 'I':
             if (rxSerialBufferPtr == 1) {
-              USBSerial_println("I:Init System");
               CH446Q_reset();
               restoreAllPins();
               digitalPinSubscribed = 255;
               analogPinSubscribed = 255;
+              USBSerial_println("I:Init System");
             }
             break;
           case 'C':
@@ -54,6 +54,7 @@ void loop() {
               uint8_t onOFF = (rxSerialBuffer[0] == 'C') ? 1 : 0;
 
               if ( (xChannel < 16) && (yChannel < 8)) {
+                CH446Q_switch_channel(xChannel, yChannel, onOFF);
                 USBSerial_print(rxSerialBuffer[0]);
                 USBSerial_print(":Turn ");
                 if (onOFF == 1) {
@@ -65,20 +66,19 @@ void loop() {
                 USBSerial_print(xChannel);
                 USBSerial_print(", Y:");
                 USBSerial_println(yChannel);
-                CH446Q_switch_channel(xChannel, yChannel, onOFF);
               }
-
             }
+            break;
           case 'B':
             if (rxSerialBufferPtr == 1) {
-              USBSerial_println("B: CH552 boot mode");
               CH552_enter_bootloader();
+              USBSerial_println("B: CH552 boot mode");
             }
             break;
           case 'b':
             if (rxSerialBufferPtr == 1) {
-              USBSerial_println("b: CH552 reboot usercode");
               CH552_reboot_usercode();
+              USBSerial_println("b: CH552 reboot usercode");
             }
             break;
           case 'R':

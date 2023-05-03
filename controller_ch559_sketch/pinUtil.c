@@ -28,7 +28,7 @@ void CH552_enter_bootloader(){
 }
 
 void CH552_reboot_usercode(){
-    CH446Q_reset();
+    //CH446Q_reset();
     CH552_power(0); //cut power to CH552
     delay(CH552_REBOOT_POWEDOWN_TIME);
     CH552_power(1); 
