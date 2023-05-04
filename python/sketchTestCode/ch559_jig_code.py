@@ -32,6 +32,7 @@ class CH559_jig:
 
         self.serial_port = None
         self.serial_buffer = ""
+        self.uart0_buffer = ""
         
 
     def connect(self):
@@ -73,6 +74,8 @@ class CH559_jig:
             self.serial_buffer = self.serial_buffer+part_before_newline
             if (len(self.serial_buffer)>0):
                 #print(self.serial_buffer)
+                if (self.serial_buffer.startswith("U:")):
+                    self.uart0_buffer = self.uart0_buffer + self.serial_buffer[2:].strip("\n\r")
                 return_list.append(self.serial_buffer.strip())
             self.serial_buffer = ""
             input_string = part_after_newline
@@ -269,3 +272,37 @@ class CH559_jig:
             return False
         return True
     
+    def init_uart0(self, baudrate=115200, wait_for_input_time=1):
+        baudrateMuliplexer = int(baudrate/9600)
+        command = f"T{baudrateMuliplexer:01x}\n"
+        responseHeader = f"T:"
+        write_response = self.write_string_wait_for_response(command, responseHeader, wait_for_input_time)
+        if (wait_for_input_time == 0):
+            return None
+        else:
+            if (len(write_response)>0):
+                try:
+                    colon_pos = write_response.find(":")
+                    after_pos_content = write_response[colon_pos+1:]
+                    if after_pos_content == "disable UART":
+                        return 0
+                    else:
+                        return (int(after_pos_content))
+                except:
+                    return None
+            else:
+                return None
+    
+    def uart0_send_string(self, string_to_send):
+        string_to_send = string_to_send.replace("\n", "\\n")
+        string_to_send = string_to_send.replace("\r", "\\r")
+        command = f"U{string_to_send}\n"
+        self.write_string_wait_for_response(command, "", 0)
+        return
+    
+    def uart0_get_buffered_string(self):
+        buffer_string = self.uart0_buffer
+        self.uart0_buffer = ""
+        buffer_string = buffer_string.replace("\\n", "\n")
+        buffer_string = buffer_string.replace("\\r", "\r")
+        return buffer_string

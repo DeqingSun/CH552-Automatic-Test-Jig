@@ -8,7 +8,7 @@ class CH552_serial_code:
         self.serial_buffer = ""
         
 
-    def connect(self, retry_time=2):
+    def connect(self, baudrate=115200,retry_time=2):
         ch552_port = None
         start_time = time.monotonic()
         while ( (time.monotonic() - start_time < retry_time) and (ch552_port == None) ):
@@ -25,7 +25,7 @@ class CH552_serial_code:
         time.sleep(0.1)
 
         try:
-            self.serial_port = serial.Serial(ch552_port.device, 115200, timeout=0)
+            self.serial_port = serial.Serial(ch552_port.device, baudrate, timeout=0)
         except Exception as e:
             print("CH55xduino open failed on "+ch552_port.device+" with error: "+type(e).__name__)
             return False
