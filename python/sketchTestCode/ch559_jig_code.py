@@ -235,7 +235,7 @@ class CH559_jig:
                 return False
             return True
         
-    def digital_read(self, pin, wait_for_input_time=0):
+    def digital_read(self, pin, wait_for_input_time=1):
         command = f"R{pin:02d}\n"
         responseHeader = f"R{pin:02d}:"
         write_response = self.write_string_wait_for_response(command, responseHeader, wait_for_input_time)
