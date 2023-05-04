@@ -22,14 +22,22 @@ if (return_code != True):
 
 all_text = ""
 
+found_text_ASCII_Table = False
+found_text_dec_126 = False
+
 start_time = time.monotonic()
 while (time.monotonic() - start_time < 5):
     return_list = ch552_serial_code.check_input()
     if (len(return_list) > 0):
         #join all the text in list return_list together
         all_text = all_text + '\n'.join(return_list)
-        if ("dec: 126" in all_text and "ASCII Table" in all_text):
+        if ("ASCII Table" in all_text):
+            found_text_ASCII_Table = True
+        if ("dec: 126" in all_text):
+            found_text_dec_126 = True
+        if (found_text_ASCII_Table and found_text_dec_126):
             exit(0)
+print(all_text)
 exit(1)
 
     
