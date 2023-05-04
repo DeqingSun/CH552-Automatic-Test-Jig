@@ -85,4 +85,20 @@ class CH552_serial_code:
         if (self.serial_port == None):
             return ""
         self.serial_port.write(raw_value.to_bytes(1, byteorder='little'))
+
+    def write_bytes(self, bytes_value):
+        if (self.serial_port == None):
+            return ""
+        self.serial_port.write(bytes_value)
+
+    def get_raw_respnse_as_bytes(self, wait_for_input_time=1):
+        if (self.serial_port == None):
+            return bytes(0)
+        start_time = time.monotonic()
+        while ( (time.monotonic() - start_time < wait_for_input_time)):
+            time.sleep(0.001)
+            if (self.serial_port.in_waiting > 0):
+                input_bytes = self.serial_port.read(self.serial_port.in_waiting)
+                return input_bytes
+        return bytes(0)
     
