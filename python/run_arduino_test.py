@@ -124,7 +124,7 @@ if need_to_test:
                 hex_files.append(os.path.join(subdir, file))
     hex_files.sort(key=os.path.getmtime)
     #for debug purposes
-    hex_files = hex_files[23:24]
+    hex_files = hex_files[24:25]
     test_index = 0
     for hex_file in hex_files:
         #find corresponding test script
