@@ -101,6 +101,20 @@ uint8_t writePin(__data uint8_t pin, __xdata uint8_t value){
     }
 }
 
+uint8_t fastPWM2(__data uint8_t value){
+#define PWM2_FREQ (4000L)
+#if (F_CPU/(PWM2_FREQ*255))>255
+    PWM_CK_SE = 255;
+#else
+    PWM_CK_SE = (F_CPU/(PWM2_FREQ*255));
+#endif
+    PWM_CYCLE = 255;
+
+    PIN_FUNC &= ~(bPWM1_PIN_X);
+    PWM_CTRL |= bPWM2_OUT_EN;
+    PWM_DATA2 = value;
+}
+
 uint8_t fastPWM3(__data uint8_t value){
     P1_DIR |= bPWM3;    //push pull
     P1_PU |= bPWM3;

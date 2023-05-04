@@ -152,7 +152,7 @@ void loop() {
               USBSerial_print((char)':');
               if ( (pin==12) || (pin==25) ){
                 if (pin==25){
-                  analogWrite(25, value); //just default 1K for P25
+                  fastPWM2(value); //4K for P25
                 }else{
                   fastPWM3(value);  //20K for P12
                 }
