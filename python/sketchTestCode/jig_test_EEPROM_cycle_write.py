@@ -10,24 +10,49 @@ if (return_code != True):
     exit(1)
 
 start_time = time.monotonic()
-lines_to_read = 0
-while ( (time.monotonic() - start_time) < 10 ):
+data_to_read = 0
+eeprom_data_old = [0]
+eeprom_data = []
+
+eeprom_check_ok = False
+
+while ( (time.monotonic() - start_time) < 15 and not eeprom_check_ok):
     ch552_print_data = ch552_serial_code.check_input()
     if len(ch552_print_data) > 0:
         for line in ch552_print_data:
             if 'DataFlash Dump:' in line:
-                lines_to_read = 8
+                eeprom_data_old = eeprom_data
+                eeprom_data = []
+                data_to_read = 128
             else:
-                if lines_to_read > 0:
-                    lines_to_read -= 1
-                    print(line)
-                    if lines_to_read == 0:
-                        print("DataFlash Dump complete")
-                        #exit(0)
-            #print(line)
-        #print(ch552_print_data)
+                if data_to_read > 0:
+                    line_to_process = line
+                    try:
+                        while( len(line_to_process)>=3 and line_to_process[2] == ',' ):
+                            eeprom_data.append(int(line_to_process[0:2],16))
+                            line_to_process = line_to_process[3:]
+                            data_to_read -= 1
+                    except:
+                        print("Error in parsing line: "+line)
+                        data_to_read = 0
 
-
+                    if len(eeprom_data) == 128:
+                        print(f"EEPROM data read on {time.monotonic()-start_time:02f}:")
+                        print((eeprom_data))
+                        if len(eeprom_data_old) == 128:
+                            #check difference between old and new data
+                            for i in range(128):
+                                if eeprom_data[i] != eeprom_data_old[i]:
+                                    print(f"new data {eeprom_data[i]} @ {i}")
+                                    if (eeprom_data[i] & 127) == i:
+                                        eeprom_check_ok = True
+                                    break
 
 ch552_serial_code.disconnect()
-exit(0)
+
+if eeprom_check_ok:
+    print("EEPROM check OK")
+    exit(0)
+else:
+    print("EEPROM check failed")
+exit(1)
