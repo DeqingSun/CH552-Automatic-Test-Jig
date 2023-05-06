@@ -133,7 +133,7 @@ if need_to_test:
         if not os.path.isfile(test_script_path):
             print(f"Test script not found at {test_script_path} for {hex_sketch_name}")
             continue
-        print(f"Now testing {test_index}/{len(hex_files)} {hex_file}")
+        print(f"Now testing {test_index}/{len(hex_files)-1} {hex_file}")
         start_time = time.monotonic()
         #use ch559_jig_code to reboot the CH552 into bootloader mode
         from sketchTestCode.ch559_jig_code import CH559_jig

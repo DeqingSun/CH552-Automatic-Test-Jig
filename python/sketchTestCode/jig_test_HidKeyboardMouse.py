@@ -1,3 +1,12 @@
+from sys import platform
+if platform == "linux" or platform == "linux2":
+    # linux
+    try:
+        from pynput import keyboard
+    except ImportError:
+        #nah, no X? just pass
+        exit(0)
+
 from pynput import keyboard, mouse
 from ch559_jig_code import CH559_jig
 import time
