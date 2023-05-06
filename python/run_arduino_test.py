@@ -4,7 +4,7 @@ import subprocess
 import time
 import shutil
 
-need_to_build = False
+need_to_build = True
 need_to_test = True
 
 with open("config.yaml", 'r') as stream:
@@ -124,7 +124,7 @@ if need_to_test:
                 hex_files.append(os.path.join(subdir, file))
     hex_files.sort(key=os.path.getmtime)
     #for debug purposes
-    hex_files = hex_files[24:25]
+    hex_files = hex_files[:]
     test_index = 0
     for hex_file in hex_files:
         #find corresponding test script
