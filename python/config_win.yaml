@@ -1,0 +1,8 @@
+arduino_cli_path : C:\Program Files\Arduino CLI\arduino-cli.exe
+arduino_build_directory : C:\TEMP\arduino_build
+arduino_core_build_directory : C:\TEMP\arduino_core
+example_search_directory : C:\Users\DSun\Desktop\ch55xduino\ch55xduino\ch55x\libraries\Generic_Examples\examples
+error_log_file : C:\TEMP\arduino_example_build_error.log
+batch_build_directory : C:\TEMP\batch_build
+upload_tool_path : C:\Users\DSun\AppData\Local\Arduino15\packages\CH55xDuino\tools\MCS51Tools\2023.04.23\win\vnproch55x.exe
+test_script_directory : C:\Users\DSun\Desktop\CH552-Automatic-Test-Jig\python\sketchTestCode
