@@ -19,12 +19,16 @@ eeprom_check_ok = False
 while ( (time.monotonic() - start_time) < 15 and not eeprom_check_ok):
     ch552_print_data = ch552_serial_code.check_input()
     if len(ch552_print_data) > 0:
+        #print(ch552_print_data)
         for line in ch552_print_data:
             if 'DataFlash Dump:' in line:
+                print(f"EEPROM data start read on {time.monotonic()-start_time:02f}:")
                 eeprom_data_old = eeprom_data
                 eeprom_data = []
                 data_to_read = 128
             else:
+                #print(line)
+                #print(data_to_read)
                 if data_to_read > 0:
                     line_to_process = line
                     try:
@@ -37,7 +41,7 @@ while ( (time.monotonic() - start_time) < 15 and not eeprom_check_ok):
                         data_to_read = 0
 
                     if len(eeprom_data) == 128:
-                        print(f"EEPROM data read on {time.monotonic()-start_time:02f}:")
+                        print(f"EEPROM data finish read on {time.monotonic()-start_time:02f}:")
                         print((eeprom_data))
                         if len(eeprom_data_old) == 128:
                             #check difference between old and new data

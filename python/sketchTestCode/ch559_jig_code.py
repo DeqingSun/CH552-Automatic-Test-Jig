@@ -79,6 +79,7 @@ class CH559_jig:
                 return_list.append(self.serial_buffer.strip())
             self.serial_buffer = ""
             input_string = part_after_newline
+        self.serial_buffer = self.serial_buffer+input_string
         return return_list
     
     def write_string_wait_for_response(self, string, string_to_wait,wait_for_input_time):
