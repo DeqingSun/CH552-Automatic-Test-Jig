@@ -54,10 +54,15 @@ def ch559_connect_pins_handler(parameters):
         return str(ch559_jig.connect_pins(pin_x, pin_y))
     else:
         return str(ch559_jig.disconnect_pins(pin_x, pin_y))
+    
+def ch559_digital_read_handler(parameters):
+    pin = int(parameters["pin"][0])
+    return str(ch559_jig.digital_read(pin))
 
 web_response_dict["/"]=root_page_handler
 web_response_dict["/ch559_init"]=ch559_init_handler      
 web_response_dict["/ch559_connect_pins"]=ch559_connect_pins_handler
+web_response_dict["/ch559_digital_read"]=ch559_digital_read_handler
 
 ch559_jig = CH559_jig()
 ch559_jig.connect()

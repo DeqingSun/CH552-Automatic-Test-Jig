@@ -33,6 +33,16 @@
             function init_func() {
                 hide_all_func_div_except("no match");
                 current_func = ""
+                var all_buttons_ch559 = Array.from(document.getElementById("ch559_div").getElementsByTagName("button"));
+                var all_buttons_ch552 = Array.from(document.getElementById("ch552_div").getElementsByTagName("button"));
+                var all_buttons_ch559_ch552 = all_buttons_ch559.concat(all_buttons_ch552);
+                var i;
+                for (i = 0; i < all_buttons_ch559_ch552.length; i++) {
+                    var one_button = all_buttons_ch559_ch552[i];
+                    if (!one_button.hasAttribute("disabled")) {
+                        one_button.setAttribute("disabled", "");
+                    }
+                }
                 var xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
@@ -58,11 +68,47 @@
                 }
             }
 
+            function digital_read_func() {
+                hide_all_func_div_except("no match");
+                current_func = "digital_read"
+                var all_buttons_ch559 = Array.from(document.getElementById("ch559_div").getElementsByTagName("button"));
+                var i;
+                for (i = 0; i < all_buttons_ch559.length; i++) {
+                    var one_button = all_buttons_ch559[i];
+                    if (one_button.innerHTML.startsWith("P")) {
+                        if (one_button.hasAttribute("disabled")) {
+                            one_button.removeAttribute("disabled");
+                        }
+                    }else{
+                        if (!one_button.hasAttribute("disabled")) {
+                            one_button.setAttribute("disabled", "");
+                        }
+                    }
+                }
+                var all_buttons_ch552 = Array.from(document.getElementById("ch552_div").getElementsByTagName("button"));
+                for (i = 0; i < all_buttons_ch552.length; i++) {
+                    var one_button = all_buttons_ch552[i];
+                    if (!one_button.hasAttribute("disabled")) {
+                        one_button.setAttribute("disabled", "");
+                    }
+                }
+            }
+
             function ch559_pin_func(port, pin, map_pin, button_obj) {
                 button_str = button_obj.innerHTML;
                 if (current_func == "connect_pins"){
                     connect_pin_y = map_pin;
                     document.getElementById("connect_pin_y").innerHTML = button_str;
+                }else if (current_func == "digital_read"){
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                            console.log("ch559_pin_func resp: "+xhttp.responseText);
+                            document.getElementById("ch559_P"+port+pin+"_data").innerHTML = xhttp.responseText.substring(0, 1);
+                        }
+                    };
+                    xhttp.open("GET", "ch559_digital_read?&pin="+(port*10+pin), true);
+                    xhttp.send();
                 }
             }
 
@@ -95,7 +141,7 @@
             Function Selects:
             <button onclick="init_func()">Initialize</button>
             <button onclick="connect_pins_func()">Connect Pins</button>
-            <button onclick="myFunction()">Digital Read</button>
+            <button onclick="digital_read_func()">Digital Read</button>
             <button onclick="myFunction()">Digital Write</button>
             <button onclick="myFunction()">Analog Read</button>
             <button onclick="myFunction()">Analog Write</button>
@@ -115,7 +161,7 @@
                             <tr>
                                 <td>P0.3/TXD_</td>
                                 <td id="ch559_P03_data">&nbsp;&nbsp;&nbsp;</td>
-                                <td><button onclick="ch559_pin_func(0,2,1,this)" disabled>P0.3</button></td>
+                                <td><button onclick="ch559_pin_func(0,3,1,this)" disabled>P0.3</button></td>
                             </tr>
                             <tr>
                                 <td>P1.2/PWM3 (T-RC)</td>
@@ -139,7 +185,7 @@
                             </tr>
                             <tr>
                                 <td>P3.2/INT0</td>
-                                <td id="ch559_P27_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td id="ch559_P32_data">&nbsp;&nbsp;&nbsp;</td>
                                 <td><button onclick="ch559_pin_func(3,2,0,this)" disabled>P3.2</button></td>
                             </tr>
                             <tr>
@@ -244,16 +290,13 @@
               </table>
         </div>
         <br>
-        <div class="control_jig_funcs"  id="connect_pins_div">
+        <div class="control_jig_funcs" id="connect_pins_div" hidden>
             Switch matrix pins:
             <label id="connect_pin_x">&nbsp;&nbsp;&nbsp;</label>
             and
             <label id="connect_pin_y">&nbsp;&nbsp;&nbsp;</label>
             <button onclick="ch559_connect_pins(1)">connect</button>
             <button onclick="ch559_connect_pins(0)">disconnect</button>
-        </div>
-        <div class="control_jig_funcs" hidden>
-            sdfsdffd
         </div>
     </body>
 </html>
