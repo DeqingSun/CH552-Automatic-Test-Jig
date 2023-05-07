@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            .function_table, .function_table td, .function_table tr {
+                border: 1px solid black;
+                border-collapse: collapse;
+                font-family: monospace;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="func_select">
+            Function Selects:
+            <button onclick="myFunction()">Initialize</button>
+            <button onclick="myFunction()">Connect Pins</button>
+            <button onclick="myFunction()">Digital Read</button>
+            <button onclick="myFunction()">Digital Write</button>
+            <button onclick="myFunction()">Analog Read</button>
+            <button onclick="myFunction()">Analog Write</button>
+        </div>
+        <br>
+        <div id="pin_select">
+            <table>
+                <tr>
+                  <td>
+                    <div id="ch559_div">
+                        <table class="function_table">
+                            <tr>
+                                <td>P0.2/RXD_</td>
+                                <td id="ch559_P02_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch559_pin_func(0,2,2)" disabled>P0.2</button></td>
+                            </tr>
+                            <tr>
+                                <td>P0.3/TXD_</td>
+                                <td id="ch559_P03_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch559_pin_func(0,2,1)" disabled>P0.3</button></td>
+                            </tr>
+                            <tr>
+                                <td>P1.2/PWM3 (T-RC)</td>
+                                <td id="ch559_P12_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch559_pin_func(1,2,3)" disabled>P1.2</button></td>
+                            </tr>
+                            <tr>
+                                <td>P2.5/PWM2</td>
+                                <td id="ch559_P25_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch559_pin_func(2,5,4)" disabled>P2.5</button></td>
+                            </tr>
+                            <tr>
+                                <td>P2.6/RXD1</td>
+                                <td id="ch559_P26_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch559_pin_func(2,6,5)" disabled>P2.6</button></td>
+                            </tr>
+                            <tr>
+                                <td>P2.7/TXD1</td>
+                                <td id="ch559_P27_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch559_pin_func(2,7,6)" disabled>P2.7</button></td>
+                            </tr>
+                            <tr>
+                                <td>P3.2/INT0</td>
+                                <td id="ch559_P27_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch559_pin_func(3,2,0)" disabled>P3.2</button></td>
+                            </tr>
+                            <tr>
+                                <td>Ext pinheader Y7</td>
+                                <td id="ch559_P02_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch559_pin_func(-1,-1,7)" disabled>Y7</button></td>
+                            </tr>
+                        </table>
+                    </div>
+                  </td>
+                  <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                  <td>
+                    <div id="ch552_div">
+                        
+                        <table class="function_table">
+                            <tr>
+                                <td><button onclick="ch552_pin_func(3,2,)" disabled>P3.2</button></td>
+                                <td id="ch552_P32_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td>P3.2/TXD1_/INT0/VBUS1/AIN3</td>
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                <td>V33</td>
+                                <td id="ch552_V33_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td><button onclick="ch552_pin_func(1,4,)" disabled>P1.4</button></td>
+                                <td id="ch559_P02_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td>P1.4/T2_/CAP1_/SCS/TIN2/UCC1/AIN1</td>
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                <td>VCC/VDD</td>
+                                <td id="ch559_VCC_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td><button onclick="ch552_pin_func(1,5,)" disabled>P1.5</button></td>
+                                <td id="ch559_P15_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td>P1.5/MOSI/PWM1/TIN3/UCC2/AIN2</td>
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                <td>GND/VSS</td>
+                                <td id="ch559_GND_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td><button onclick="ch552_pin_func(1,6,)" disabled>P1.6</button></td>
+                                <td id="ch559_P16_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td>P1.6/MISO/RXD1/TIN4</td>
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                <td>P3.7/UDM</td>
+                                <td id="ch559_P37_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch552_pin_func(3,7,)" disabled>P3.7</button></td>
+                            </tr>
+                            <tr>
+                                <td><button onclick="ch552_pin_func(1,7,)" disabled>P1.7</button></td>
+                                <td id="ch559_P17_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td>P1.7/SCK/TXD1/TIN5</td>
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                <td>P3.6/UDP</td>
+                                <td id="ch559_P36_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch552_pin_func(3,6,)" disabled>P3.6</button></td>
+                            </tr>
+                            <tr>
+                                <td><button onclick="ch552_pin_func(-1,-1,)" disabled>RST</button></td>
+                                <td id="ch559_RST_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td>RST/T2EX_/CAP2_</td>
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                <td>P3.4/PWM2/RXD1_/T0</td>
+                                <td id="ch559_P34_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch552_pin_func(3,4,)" disabled>P3.4</button></td>
+                            </tr>
+                            <tr>
+                                <td><button onclick="ch552_pin_func(3,1,)" disabled>P3.1</button></td>
+                                <td id="ch559_P31_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td>P3.1/PWM2_/TXD</td>
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                <td>P3.3/INT1</td>
+                                <td id="ch559_P33_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch552_pin_func(3,3,)" disabled>P3.3</button></td>
+                            </tr>
+                            <tr>
+                                <td><button onclick="ch552_pin_func(3,0,)" disabled>P3.0</button></td>
+                                <td id="ch559_P30_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td>P3.0/PWM1_/RXD</td>
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                <td>P1.1/T2EX/CAP2/TIN1/VBUS2/AIN0</td>
+                                <td id="ch559_P11_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch552_pin_func(1,1,)" disabled>P1.1</button></td>
+                            </tr>
+                        </table>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+        </div>
+    </body>
+</html>
