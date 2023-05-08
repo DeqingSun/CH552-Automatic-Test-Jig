@@ -237,6 +237,28 @@
                 xhttp.send();
             }
 
+            function reboot_func() {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log("reboot_func resp: "+xhttp.responseText);
+                    }
+                };
+                xhttp.open("GET", "ch559_reboot", true);
+                xhttp.send();
+            }
+
+            function init_bootloader_func() {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log("init_bootloader_func resp: "+xhttp.responseText);
+                    }
+                };
+                xhttp.open("GET", "ch559_bootloader", true);
+                xhttp.send();
+            }
+
         </script>
     </head>
     <body>
@@ -248,6 +270,9 @@
             <button onclick="digital_write_func()">Digital Write</button>
             <button onclick="analog_read_func()">Analog Read</button>
             <button onclick="analog_write_func()">Analog Write</button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button onclick="reboot_func()">Reboot</button>
+            <button onclick="init_bootloader_func()">Init & Bootloader</button>
         </div>
         <br>
         <div id="pin_select">
