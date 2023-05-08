@@ -26,3 +26,7 @@ The software part is a bunch of Python scripts. At this moment, the software is 
 
 The master test script uses Arduino Cli tool to compile all examples into hex files and check if there is any failure. Then for each of the hex file, the master test script will power cycle the target chip and upload the hex file, then pull the the matching sketch test script to validate the funtions.
 
+Also, another script exposes the CH559 chip to a webpage. And it is easier to use the board for general development and debugging, especially when the board when is used remotely.
+
+![photo of control webpage](https://raw.githubusercontent.com/DeqingSun/CH552-Automatic-Test-Jig/main/img/control_page.png)
+
