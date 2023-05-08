@@ -68,12 +68,18 @@ def ch559_analog_read_handler(parameters):
     pin = int(parameters["pin"][0])
     return str(ch559_jig.analog_read(pin))
 
+def ch559_analog_write_handler(parameters):
+    pin = int(parameters["pin"][0])
+    val = int(parameters["value"][0])
+    return str(ch559_jig.analog_write(pin, val))
+
 web_response_dict["/"]=root_page_handler
 web_response_dict["/ch559_init"]=ch559_init_handler      
 web_response_dict["/ch559_connect_pins"]=ch559_connect_pins_handler
 web_response_dict["/ch559_digital_read"]=ch559_digital_read_handler
 web_response_dict["/ch559_digital_write"]=ch559_digital_write_handler
 web_response_dict["/ch559_analog_read"]=ch559_analog_read_handler
+web_response_dict["/ch559_analog_write"]=ch559_analog_write_handler
 
 ch559_jig = CH559_jig()
 ch559_jig.connect()

@@ -13,6 +13,7 @@
             var connect_pin_x = -1;
             var connect_pin_y = -1;
             var digital_write_pin = -1;
+            var analog_write_pin = -1;
 
             function hide_all_func_div_except(except_str){
                 var x = document.getElementsByClassName("control_jig_funcs");
@@ -36,7 +37,18 @@
                 var i;
                 for (i = 0; i < all_buttons_ch559.length; i++) {
                     var one_button = all_buttons_ch559[i];
-                    if (one_button.innerHTML.startsWith(except_str_ch559)) {
+                    var button_to_enable = false;
+                    if (Array.isArray(except_str_ch559)) {
+                        for (j = 0; j < except_str_ch559.length; j++) {
+                            if (one_button.innerHTML.startsWith(except_str_ch559[j])) {
+                                button_to_enable = true;
+                                break;
+                            }
+                        }
+                    }else{
+                        button_to_enable = one_button.innerHTML.startsWith(except_str_ch559);
+                    }
+                    if (button_to_enable) {
                         if (one_button.hasAttribute("disabled")) {
                             one_button.removeAttribute("disabled");
                         }
@@ -99,6 +111,12 @@
                 hide_all_ch559_ch552_button_except_start_with("P1.2","no match");
             }
 
+            function analog_write_func() {
+                hide_all_func_div_except("analog_write_div");
+                current_func = "analog_write"
+                hide_all_ch559_ch552_button_except_start_with(["P1.2","P2.5"],"no match");
+            }
+
             function ch559_pin_func(port, pin, map_pin, button_obj) {
                 button_str = button_obj.innerHTML;
                 if (current_func == "connect_pins"){
@@ -111,6 +129,9 @@
                     document.getElementById("digital_write_pin").innerHTML = button_str;
                 }else if (current_func == "analog_read"){
                     ch559_analog_read_xmlrequest(port, pin);
+                }else if (current_func == "analog_write"){
+                    analog_write_pin = port*10+pin;
+                    document.getElementById("analog_write_pin").innerHTML = button_str;
                 }
             }
 
@@ -130,6 +151,22 @@
                 port = Math.floor(digital_write_pin/10);
                 pin = digital_write_pin%10;
                 ch559_digital_write_xmlrequest(port, pin, value);
+            }
+
+            function ch559_analog_write_pin(){
+                if (analog_write_pin < 0) {
+                    console.error("Please select pin to write");
+                    return;
+                }
+                var value = parseInt(document.getElementById("analog_write_value").value,10);
+                if (isNaN(value) || value < 0 || value > 255) {
+                    console.error("Please use 0-255 as analog write value");
+                    return;
+                }
+
+                port = Math.floor(analog_write_pin/10);
+                pin = analog_write_pin%10;
+                ch559_analog_write_xmlrequest(port, pin, value);
             }
 
 
@@ -186,6 +223,20 @@
                 xhttp.send();
             }
 
+            function ch559_analog_write_xmlrequest(port, pin, value) {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log("ch559_analog_write_xmlrequest resp: "+xhttp.responseText);
+                        if (xhttp.responseText == "True") {
+                            document.getElementById("ch559_P"+port+pin+"_data").innerHTML = (value);
+                        }
+                    }
+                };
+                xhttp.open("GET", "ch559_analog_write?pin="+(port*10+pin)+"&value="+value, true);
+                xhttp.send();
+            }
+
         </script>
     </head>
     <body>
@@ -196,7 +247,7 @@
             <button onclick="digital_read_func()">Digital Read</button>
             <button onclick="digital_write_func()">Digital Write</button>
             <button onclick="analog_read_func()">Analog Read</button>
-            <button onclick="myFunction()">Analog Write</button>
+            <button onclick="analog_write_func()">Analog Write</button>
         </div>
         <br>
         <div id="pin_select">
@@ -355,6 +406,12 @@
             <label id="digital_write_pin">&nbsp;&nbsp;&nbsp;</label>
             <button onclick="ch559_digital_write_pin(1)">High</button>
             <button onclick="ch559_digital_write_pin(0)">Low</button>
+        </div>
+        <div class="control_jig_funcs" id="analog_write_div" hidden>
+            Analog write pin:
+            <label id="analog_write_pin">&nbsp;&nbsp;&nbsp;</label>
+            <input type="number" id="analog_write_value">
+            <button onclick="ch559_analog_write_pin()">Write</button>
         </div>
     </body>
 </html>
