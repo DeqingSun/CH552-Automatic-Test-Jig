@@ -31,19 +31,40 @@
                 }
             }
 
+            function hide_all_ch559_ch552_button_except_start_with(except_str_ch559,except_str_ch552){
+                var all_buttons_ch559 = Array.from(document.getElementById("ch559_div").getElementsByTagName("button"));
+                var i;
+                for (i = 0; i < all_buttons_ch559.length; i++) {
+                    var one_button = all_buttons_ch559[i];
+                    if (one_button.innerHTML.startsWith(except_str_ch559)) {
+                        if (one_button.hasAttribute("disabled")) {
+                            one_button.removeAttribute("disabled");
+                        }
+                    }else{
+                        if (!one_button.hasAttribute("disabled")) {
+                            one_button.setAttribute("disabled", "");
+                        }
+                    }
+                }
+                var all_buttons_ch552 = Array.from(document.getElementById("ch552_div").getElementsByTagName("button"));
+                for (i = 0; i < all_buttons_ch552.length; i++) {
+                    var one_button = all_buttons_ch552[i];
+                    if (one_button.innerHTML.startsWith(except_str_ch552)) {
+                        if (one_button.hasAttribute("disabled")) {
+                            one_button.removeAttribute("disabled");
+                        }
+                    }else{
+                        if (!one_button.hasAttribute("disabled")) {
+                            one_button.setAttribute("disabled", "");
+                        }
+                    }
+                }
+            }
+
             function init_func() {
                 hide_all_func_div_except("no match");
                 current_func = ""
-                var all_buttons_ch559 = Array.from(document.getElementById("ch559_div").getElementsByTagName("button"));
-                var all_buttons_ch552 = Array.from(document.getElementById("ch552_div").getElementsByTagName("button"));
-                var all_buttons_ch559_ch552 = all_buttons_ch559.concat(all_buttons_ch552);
-                var i;
-                for (i = 0; i < all_buttons_ch559_ch552.length; i++) {
-                    var one_button = all_buttons_ch559_ch552[i];
-                    if (!one_button.hasAttribute("disabled")) {
-                        one_button.setAttribute("disabled", "");
-                    }
-                }
+                hide_all_ch559_ch552_button_except_start_with("no match","no match");
                 var xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
@@ -57,68 +78,25 @@
             function connect_pins_func() {
                 hide_all_func_div_except("connect_pins_div");
                 current_func = "connect_pins"
-                var all_buttons_ch559 = Array.from(document.getElementById("ch559_div").getElementsByTagName("button"));
-                var all_buttons_ch552 = Array.from(document.getElementById("ch552_div").getElementsByTagName("button"));
-                var all_buttons_ch559_ch552 = all_buttons_ch559.concat(all_buttons_ch552);
-                var i;
-                for (i = 0; i < all_buttons_ch559_ch552.length; i++) {
-                    var one_button = all_buttons_ch559_ch552[i];
-                    if (one_button.hasAttribute("disabled")) {
-                        one_button.removeAttribute("disabled");
-                    }
-                }
+                hide_all_ch559_ch552_button_except_start_with("","");
             }
 
             function digital_read_func() {
                 hide_all_func_div_except("no match");
                 current_func = "digital_read"
-                var all_buttons_ch559 = Array.from(document.getElementById("ch559_div").getElementsByTagName("button"));
-                var i;
-                for (i = 0; i < all_buttons_ch559.length; i++) {
-                    var one_button = all_buttons_ch559[i];
-                    if (one_button.innerHTML.startsWith("P")) {
-                        if (one_button.hasAttribute("disabled")) {
-                            one_button.removeAttribute("disabled");
-                        }
-                    }else{
-                        if (!one_button.hasAttribute("disabled")) {
-                            one_button.setAttribute("disabled", "");
-                        }
-                    }
-                }
-                var all_buttons_ch552 = Array.from(document.getElementById("ch552_div").getElementsByTagName("button"));
-                for (i = 0; i < all_buttons_ch552.length; i++) {
-                    var one_button = all_buttons_ch552[i];
-                    if (!one_button.hasAttribute("disabled")) {
-                        one_button.setAttribute("disabled", "");
-                    }
-                }
+                hide_all_ch559_ch552_button_except_start_with("P","no match");
             }
 
             function digital_write_func() {
                 hide_all_func_div_except("digital_write_div");
                 current_func = "digital_write"
-                var all_buttons_ch559 = Array.from(document.getElementById("ch559_div").getElementsByTagName("button"));
-                var i;
-                for (i = 0; i < all_buttons_ch559.length; i++) {
-                    var one_button = all_buttons_ch559[i];
-                    if (one_button.innerHTML.startsWith("P")) {
-                        if (one_button.hasAttribute("disabled")) {
-                            one_button.removeAttribute("disabled");
-                        }
-                    }else{
-                        if (!one_button.hasAttribute("disabled")) {
-                            one_button.setAttribute("disabled", "");
-                        }
-                    }
-                }
-                var all_buttons_ch552 = Array.from(document.getElementById("ch552_div").getElementsByTagName("button"));
-                for (i = 0; i < all_buttons_ch552.length; i++) {
-                    var one_button = all_buttons_ch552[i];
-                    if (!one_button.hasAttribute("disabled")) {
-                        one_button.setAttribute("disabled", "");
-                    }
-                }
+                hide_all_ch559_ch552_button_except_start_with("P","no match");
+            }
+
+            function analog_read_func() {
+                hide_all_func_div_except("no match");
+                current_func = "analog_read"
+                hide_all_ch559_ch552_button_except_start_with("P1.2","no match");
             }
 
             function ch559_pin_func(port, pin, map_pin, button_obj) {
@@ -131,6 +109,8 @@
                 }else if (current_func == "digital_write"){
                     digital_write_pin = port*10+pin;
                     document.getElementById("digital_write_pin").innerHTML = button_str;
+                }else if (current_func == "analog_read"){
+                    ch559_analog_read_xmlrequest(port, pin);
                 }
             }
 
@@ -194,6 +174,18 @@
                 xhttp.send();
             }
 
+            function ch559_analog_read_xmlrequest(port, pin) {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log("ch559_analog_read_xmlrequest resp: "+xhttp.responseText);
+                        document.getElementById("ch559_P"+port+pin+"_data").innerHTML = xhttp.responseText;
+                    }
+                };
+                xhttp.open("GET", "ch559_analog_read?pin="+(port*10+pin), true);
+                xhttp.send();
+            }
+
         </script>
     </head>
     <body>
@@ -203,7 +195,7 @@
             <button onclick="connect_pins_func()">Connect Pins</button>
             <button onclick="digital_read_func()">Digital Read</button>
             <button onclick="digital_write_func()">Digital Write</button>
-            <button onclick="myFunction()">Analog Read</button>
+            <button onclick="analog_read_func()">Analog Read</button>
             <button onclick="myFunction()">Analog Write</button>
         </div>
         <br>
@@ -224,7 +216,7 @@
                                 <td><button onclick="ch559_pin_func(0,3,1,this)" disabled>P0.3</button></td>
                             </tr>
                             <tr>
-                                <td>P1.2/PWM3 (T-RC)</td>
+                                <td>P1.2/AIN2/PWM3 (T-RC)</td>
                                 <td id="ch559_P12_data">&nbsp;&nbsp;&nbsp;</td>
                                 <td><button onclick="ch559_pin_func(1,2,3,this)" disabled>P1.2</button></td>
                             </tr>
@@ -249,7 +241,7 @@
                                 <td><button onclick="ch559_pin_func(3,2,0,this)" disabled>P3.2</button></td>
                             </tr>
                             <tr>
-                                <td>Ext pinheader Y7</td>
+                                <td>External pinheader Y7</td>
                                 <td id="ch559_Y7_data">&nbsp;&nbsp;&nbsp;</td>
                                 <td><button onclick="ch559_pin_func(-1,-1,7,this)" disabled>Y7</button></td>
                             </tr>
@@ -337,9 +329,9 @@
                             <tr>
                                 <td><button onclick="ch552_pin_func(-1,-1,10,this)" disabled>X10</button></td>
                                 <td id="ch559_X10_data">&nbsp;&nbsp;&nbsp;</td>
-                                <td>Ext pinheader X10</td>
+                                <td>External pinheader X10</td>
                                 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                                <td>Ext pinheader X11</td>
+                                <td>External pinheader X11</td>
                                 <td id="ch559_X11_data">&nbsp;&nbsp;&nbsp;</td>
                                 <td><button onclick="ch552_pin_func(-1,-1,11,this)" disabled>X11</button></td>
                             </tr>
