@@ -12,6 +12,7 @@
             var current_func = "";
             var connect_pin_x = -1;
             var connect_pin_y = -1;
+            var digital_write_pin = -1;
 
             function hide_all_func_div_except(except_str){
                 var x = document.getElementsByClassName("control_jig_funcs");
@@ -94,21 +95,42 @@
                 }
             }
 
+            function digital_write_func() {
+                hide_all_func_div_except("digital_write_div");
+                current_func = "digital_write"
+                var all_buttons_ch559 = Array.from(document.getElementById("ch559_div").getElementsByTagName("button"));
+                var i;
+                for (i = 0; i < all_buttons_ch559.length; i++) {
+                    var one_button = all_buttons_ch559[i];
+                    if (one_button.innerHTML.startsWith("P")) {
+                        if (one_button.hasAttribute("disabled")) {
+                            one_button.removeAttribute("disabled");
+                        }
+                    }else{
+                        if (!one_button.hasAttribute("disabled")) {
+                            one_button.setAttribute("disabled", "");
+                        }
+                    }
+                }
+                var all_buttons_ch552 = Array.from(document.getElementById("ch552_div").getElementsByTagName("button"));
+                for (i = 0; i < all_buttons_ch552.length; i++) {
+                    var one_button = all_buttons_ch552[i];
+                    if (!one_button.hasAttribute("disabled")) {
+                        one_button.setAttribute("disabled", "");
+                    }
+                }
+            }
+
             function ch559_pin_func(port, pin, map_pin, button_obj) {
                 button_str = button_obj.innerHTML;
                 if (current_func == "connect_pins"){
                     connect_pin_y = map_pin;
                     document.getElementById("connect_pin_y").innerHTML = button_str;
                 }else if (current_func == "digital_read"){
-                    var xhttp = new XMLHttpRequest();
-                    xhttp.onreadystatechange = function() {
-                        if (this.readyState == 4 && this.status == 200) {
-                            console.log("ch559_pin_func resp: "+xhttp.responseText);
-                            document.getElementById("ch559_P"+port+pin+"_data").innerHTML = xhttp.responseText.substring(0, 1);
-                        }
-                    };
-                    xhttp.open("GET", "ch559_digital_read?&pin="+(port*10+pin), true);
-                    xhttp.send();
+                    ch559_digital_read_xmlrequest(port, pin);
+                }else if (current_func == "digital_write"){
+                    digital_write_pin = port*10+pin;
+                    document.getElementById("digital_write_pin").innerHTML = button_str;
                 }
             }
 
@@ -119,6 +141,17 @@
                     document.getElementById("connect_pin_x").innerHTML = button_str;
                 }
             }
+
+            function ch559_digital_write_pin(value) {
+                if (digital_write_pin < 0) {
+                    console.error("Please select pin to write");
+                    return;
+                }
+                port = Math.floor(digital_write_pin/10);
+                pin = digital_write_pin%10;
+                ch559_digital_write_xmlrequest(port, pin, value);
+            }
+
 
             function ch559_connect_pins(conn){
                 if (connect_pin_x < 0 || connect_pin_y < 0) {
@@ -134,6 +167,33 @@
                 xhttp.open("GET", "ch559_connect_pins?conn="+conn+"&x="+connect_pin_x+"&y="+connect_pin_y, true);
                 xhttp.send();
             }
+
+            function ch559_digital_read_xmlrequest(port, pin) {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log("ch559_digital_read_xmlrequest resp: "+xhttp.responseText);
+                        document.getElementById("ch559_P"+port+pin+"_data").innerHTML = (xhttp.responseText.substring(0, 1)=="T")?"H":"L";
+                    }
+                };
+                xhttp.open("GET", "ch559_digital_read?pin="+(port*10+pin), true);
+                xhttp.send();
+            }
+
+            function ch559_digital_write_xmlrequest(port, pin, value) {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log("ch559_digital_write_xmlrequest resp: "+xhttp.responseText);
+                        if (xhttp.responseText == "True") {
+                            document.getElementById("ch559_P"+port+pin+"_data").innerHTML = (value>0)?"H":"L";
+                        }
+                    }
+                };
+                xhttp.open("GET", "ch559_digital_write?pin="+(port*10+pin)+"&value="+value, true);
+                xhttp.send();
+            }
+
         </script>
     </head>
     <body>
@@ -142,7 +202,7 @@
             <button onclick="init_func()">Initialize</button>
             <button onclick="connect_pins_func()">Connect Pins</button>
             <button onclick="digital_read_func()">Digital Read</button>
-            <button onclick="myFunction()">Digital Write</button>
+            <button onclick="digital_write_func()">Digital Write</button>
             <button onclick="myFunction()">Analog Read</button>
             <button onclick="myFunction()">Analog Write</button>
         </div>
@@ -297,6 +357,12 @@
             <label id="connect_pin_y">&nbsp;&nbsp;&nbsp;</label>
             <button onclick="ch559_connect_pins(1)">connect</button>
             <button onclick="ch559_connect_pins(0)">disconnect</button>
+        </div>
+        <div class="control_jig_funcs" id="digital_write_div" hidden>
+            Digital write pin:
+            <label id="digital_write_pin">&nbsp;&nbsp;&nbsp;</label>
+            <button onclick="ch559_digital_write_pin(1)">High</button>
+            <button onclick="ch559_digital_write_pin(0)">Low</button>
         </div>
     </body>
 </html>
