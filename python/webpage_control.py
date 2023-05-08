@@ -39,7 +39,7 @@ class GetHandler(http.server.SimpleHTTPRequestHandler):
             http.server.SimpleHTTPRequestHandler.do_GET(self)
 
 def root_page_handler(parameters):
-    with open("webpage_template.html", "r") as f:
+    with open("index.html", "r") as f:
         webpage_template = f.read()
     return webpage_template
 
