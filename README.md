@@ -22,3 +22,7 @@ The Raspberry Pi serves as the compiler and controller of the whole system. Rasp
 
 ## Software
 
+The software part is a bunch of Python scripts. At this moment, the software is not connected to continuous integration because of security concerns and 14 days limit of Github Action self-hosted runner. 
+
+The master test script uses Arduino Cli tool to compile all examples into hex files and check if there is any failure. Then for each of the hex file, the master test script will power cycle the target chip and upload the hex file, then pull the the matching sketch test script to validate the funtions.
+
