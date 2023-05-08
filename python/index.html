@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            .function_table, .function_table td, .function_table tr {
+                border: 1px solid black;
+                border-collapse: collapse;
+                font-family: monospace;
+            }
+        </style>
+        <script>
+            var current_func = "";
+            var connect_pin_x = -1;
+            var connect_pin_y = -1;
+            var digital_write_pin = -1;
+            var analog_write_pin = -1;
+
+            function hide_all_func_div_except(except_str){
+                var x = document.getElementsByClassName("control_jig_funcs");
+                var i;
+                for (i = 0; i < x.length; i++) {
+                    var one_div = x[i];
+                    if (except_str == one_div.id) {
+                        if (one_div.hasAttribute("hidden")) {
+                            one_div.removeAttribute("hidden");
+                        }
+                    } else {
+                        if (!one_div.hasAttribute("hidden")) {
+                            one_div.setAttribute("hidden", "");
+                        }
+                    }
+                }
+            }
+
+            function hide_all_ch559_ch552_button_except_start_with(except_str_ch559,except_str_ch552){
+                var all_buttons_ch559 = Array.from(document.getElementById("ch559_div").getElementsByTagName("button"));
+                var i;
+                for (i = 0; i < all_buttons_ch559.length; i++) {
+                    var one_button = all_buttons_ch559[i];
+                    var button_to_enable = false;
+                    if (Array.isArray(except_str_ch559)) {
+                        for (j = 0; j < except_str_ch559.length; j++) {
+                            if (one_button.innerHTML.startsWith(except_str_ch559[j])) {
+                                button_to_enable = true;
+                                break;
+                            }
+                        }
+                    }else{
+                        button_to_enable = one_button.innerHTML.startsWith(except_str_ch559);
+                    }
+                    if (button_to_enable) {
+                        if (one_button.hasAttribute("disabled")) {
+                            one_button.removeAttribute("disabled");
+                        }
+                    }else{
+                        if (!one_button.hasAttribute("disabled")) {
+                            one_button.setAttribute("disabled", "");
+                        }
+                    }
+                }
+                var all_buttons_ch552 = Array.from(document.getElementById("ch552_div").getElementsByTagName("button"));
+                for (i = 0; i < all_buttons_ch552.length; i++) {
+                    var one_button = all_buttons_ch552[i];
+                    if (one_button.innerHTML.startsWith(except_str_ch552)) {
+                        if (one_button.hasAttribute("disabled")) {
+                            one_button.removeAttribute("disabled");
+                        }
+                    }else{
+                        if (!one_button.hasAttribute("disabled")) {
+                            one_button.setAttribute("disabled", "");
+                        }
+                    }
+                }
+            }
+
+            function init_func() {
+                hide_all_func_div_except("no match");
+                current_func = ""
+                hide_all_ch559_ch552_button_except_start_with("no match","no match");
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log("init_func resp: "+xhttp.responseText);
+                    }
+                };
+                xhttp.open("GET", "ch559_init", true);
+                xhttp.send();
+            }
+
+            function connect_pins_func() {
+                hide_all_func_div_except("connect_pins_div");
+                current_func = "connect_pins"
+                hide_all_ch559_ch552_button_except_start_with("","");
+            }
+
+            function digital_read_func() {
+                hide_all_func_div_except("no match");
+                current_func = "digital_read"
+                hide_all_ch559_ch552_button_except_start_with("P","no match");
+            }
+
+            function digital_write_func() {
+                hide_all_func_div_except("digital_write_div");
+                current_func = "digital_write"
+                hide_all_ch559_ch552_button_except_start_with("P","no match");
+            }
+
+            function analog_read_func() {
+                hide_all_func_div_except("no match");
+                current_func = "analog_read"
+                hide_all_ch559_ch552_button_except_start_with("P1.2","no match");
+            }
+
+            function analog_write_func() {
+                hide_all_func_div_except("analog_write_div");
+                current_func = "analog_write"
+                hide_all_ch559_ch552_button_except_start_with(["P1.2","P2.5"],"no match");
+            }
+
+            function ch559_pin_func(port, pin, map_pin, button_obj) {
+                button_str = button_obj.innerHTML;
+                if (current_func == "connect_pins"){
+                    connect_pin_y = map_pin;
+                    document.getElementById("connect_pin_y").innerHTML = button_str;
+                }else if (current_func == "digital_read"){
+                    ch559_digital_read_xmlrequest(port, pin);
+                }else if (current_func == "digital_write"){
+                    digital_write_pin = port*10+pin;
+                    document.getElementById("digital_write_pin").innerHTML = button_str;
+                }else if (current_func == "analog_read"){
+                    ch559_analog_read_xmlrequest(port, pin);
+                }else if (current_func == "analog_write"){
+                    analog_write_pin = port*10+pin;
+                    document.getElementById("analog_write_pin").innerHTML = button_str;
+                }
+            }
+
+            function ch552_pin_func(port, pin, map_pin, button_obj) {
+                button_str = button_obj.innerHTML;
+                if (current_func == "connect_pins"){
+                    connect_pin_x = map_pin;
+                    document.getElementById("connect_pin_x").innerHTML = button_str;
+                }
+            }
+
+            function ch559_digital_write_pin(value) {
+                if (digital_write_pin < 0) {
+                    console.error("Please select pin to write");
+                    return;
+                }
+                port = Math.floor(digital_write_pin/10);
+                pin = digital_write_pin%10;
+                ch559_digital_write_xmlrequest(port, pin, value);
+            }
+
+            function ch559_analog_write_pin(){
+                if (analog_write_pin < 0) {
+                    console.error("Please select pin to write");
+                    return;
+                }
+                var value = parseInt(document.getElementById("analog_write_value").value,10);
+                if (isNaN(value) || value < 0 || value > 255) {
+                    console.error("Please use 0-255 as analog write value");
+                    return;
+                }
+
+                port = Math.floor(analog_write_pin/10);
+                pin = analog_write_pin%10;
+                ch559_analog_write_xmlrequest(port, pin, value);
+            }
+
+
+            function ch559_connect_pins(conn){
+                if (connect_pin_x < 0 || connect_pin_y < 0) {
+                    console.error("Please select pins to connect");
+                    return;
+                }
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log("ch559_connect_pins resp: "+xhttp.responseText);
+                    }
+                };
+                xhttp.open("GET", "ch559_connect_pins?conn="+conn+"&x="+connect_pin_x+"&y="+connect_pin_y, true);
+                xhttp.send();
+            }
+
+            function ch559_digital_read_xmlrequest(port, pin) {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log("ch559_digital_read_xmlrequest resp: "+xhttp.responseText);
+                        document.getElementById("ch559_P"+port+pin+"_data").innerHTML = (xhttp.responseText.substring(0, 1)=="T")?"H":"L";
+                    }
+                };
+                xhttp.open("GET", "ch559_digital_read?pin="+(port*10+pin), true);
+                xhttp.send();
+            }
+
+            function ch559_digital_write_xmlrequest(port, pin, value) {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log("ch559_digital_write_xmlrequest resp: "+xhttp.responseText);
+                        if (xhttp.responseText == "True") {
+                            document.getElementById("ch559_P"+port+pin+"_data").innerHTML = (value>0)?"H":"L";
+                        }
+                    }
+                };
+                xhttp.open("GET", "ch559_digital_write?pin="+(port*10+pin)+"&value="+value, true);
+                xhttp.send();
+            }
+
+            function ch559_analog_read_xmlrequest(port, pin) {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log("ch559_analog_read_xmlrequest resp: "+xhttp.responseText);
+                        document.getElementById("ch559_P"+port+pin+"_data").innerHTML = xhttp.responseText;
+                    }
+                };
+                xhttp.open("GET", "ch559_analog_read?pin="+(port*10+pin), true);
+                xhttp.send();
+            }
+
+            function ch559_analog_write_xmlrequest(port, pin, value) {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log("ch559_analog_write_xmlrequest resp: "+xhttp.responseText);
+                        if (xhttp.responseText == "True") {
+                            document.getElementById("ch559_P"+port+pin+"_data").innerHTML = (value);
+                        }
+                    }
+                };
+                xhttp.open("GET", "ch559_analog_write?pin="+(port*10+pin)+"&value="+value, true);
+                xhttp.send();
+            }
+
+        </script>
+    </head>
+    <body>
+        <div id="func_select">
+            Function Selects:
+            <button onclick="init_func()">Initialize</button>
+            <button onclick="connect_pins_func()">Connect Pins</button>
+            <button onclick="digital_read_func()">Digital Read</button>
+            <button onclick="digital_write_func()">Digital Write</button>
+            <button onclick="analog_read_func()">Analog Read</button>
+            <button onclick="analog_write_func()">Analog Write</button>
+        </div>
+        <br>
+        <div id="pin_select">
+            <table>
+                <tr>
+                  <td>
+                    <div id="ch559_div">
+                        <table class="function_table">
+                            <tr>
+                                <td>P0.2/RXD_</td>
+                                <td id="ch559_P02_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch559_pin_func(0,2,2,this)" disabled>P0.2</button></td>
+                            </tr>
+                            <tr>
+                                <td>P0.3/TXD_</td>
+                                <td id="ch559_P03_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch559_pin_func(0,3,1,this)" disabled>P0.3</button></td>
+                            </tr>
+                            <tr>
+                                <td>P1.2/AIN2/PWM3 (T-RC)</td>
+                                <td id="ch559_P12_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch559_pin_func(1,2,3,this)" disabled>P1.2</button></td>
+                            </tr>
+                            <tr>
+                                <td>P2.5/PWM2</td>
+                                <td id="ch559_P25_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch559_pin_func(2,5,4,this)" disabled>P2.5</button></td>
+                            </tr>
+                            <tr>
+                                <td>P2.6/RXD1</td>
+                                <td id="ch559_P26_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch559_pin_func(2,6,5,this)" disabled>P2.6</button></td>
+                            </tr>
+                            <tr>
+                                <td>P2.7/TXD1</td>
+                                <td id="ch559_P27_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch559_pin_func(2,7,6,this)" disabled>P2.7</button></td>
+                            </tr>
+                            <tr>
+                                <td>P3.2/INT0</td>
+                                <td id="ch559_P32_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch559_pin_func(3,2,0,this)" disabled>P3.2</button></td>
+                            </tr>
+                            <tr>
+                                <td>External pinheader Y7</td>
+                                <td id="ch559_Y7_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch559_pin_func(-1,-1,7,this)" disabled>Y7</button></td>
+                            </tr>
+                        </table>
+                    </div>
+                  </td>
+                  <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                  <td>
+                    <div id="ch552_div">
+                        
+                        <table class="function_table">
+                            <tr>
+                                <td><button onclick="ch552_pin_func(3,2,13,this)" disabled>P3.2</button></td>
+                                <td id="ch552_P32_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td>P3.2/TXD1_/INT0/VBUS1/AIN3</td>
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                <td>V33</td>
+                                <td id="ch552_V33_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td><button onclick="ch552_pin_func(1,4,12,this)" disabled>P1.4</button></td>
+                                <td id="ch559_P02_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td>P1.4/T2_/CAP1_/SCS/TIN2/UCC1/AIN1</td>
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                <td>VCC/VDD</td>
+                                <td id="ch559_VCC_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td><button onclick="ch552_pin_func(1,5,5,this)" disabled>P1.5</button></td>
+                                <td id="ch559_P15_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td>P1.5/MOSI/PWM1/TIN3/UCC2/AIN2</td>
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                <td>GND/VSS</td>
+                                <td id="ch559_GND_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td><button onclick="ch552_pin_func(1,6,4,this)" disabled>P1.6</button></td>
+                                <td id="ch559_P16_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td>P1.6/MISO/RXD1/TIN4</td>
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                <td>P3.7/UDM</td>
+                                <td id="ch559_P37_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch552_pin_func(3,7,14,this)" disabled>P3.7</button></td>
+                            </tr>
+                            <tr>
+                                <td><button onclick="ch552_pin_func(1,7,3,this)" disabled>P1.7</button></td>
+                                <td id="ch559_P17_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td>P1.7/SCK/TXD1/TIN5</td>
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                <td>P3.6/UDP</td>
+                                <td id="ch559_P36_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch552_pin_func(3,6,15,this)" disabled>P3.6</button></td>
+                            </tr>
+                            <tr>
+                                <td><button onclick="ch552_pin_func(-1,-1,2,this)" disabled>RST</button></td>
+                                <td id="ch559_RST_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td>RST/T2EX_/CAP2_</td>
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                <td>P3.4/PWM2/RXD1_/T0</td>
+                                <td id="ch559_P34_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch552_pin_func(3,4,7,this)" disabled>P3.4</button></td>
+                            </tr>
+                            <tr>
+                                <td><button onclick="ch552_pin_func(3,1,1,this)" disabled>P3.1</button></td>
+                                <td id="ch559_P31_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td>P3.1/PWM2_/TXD</td>
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                <td>P3.3/INT1</td>
+                                <td id="ch559_P33_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch552_pin_func(3,3,8,this)" disabled>P3.3</button></td>
+                            </tr>
+                            <tr>
+                                <td><button onclick="ch552_pin_func(3,0,0,this)" disabled>P3.0</button></td>
+                                <td id="ch559_P30_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td>P3.0/PWM1_/RXD</td>
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                <td>P1.1/T2EX/CAP2/TIN1/VBUS2/AIN0</td>
+                                <td id="ch559_P11_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch552_pin_func(1,1,9,this)" disabled>P1.1</button></td>
+                            </tr>
+                            <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+                            <tr>
+                                <td><button onclick="ch552_pin_func(-1,-1,10,this)" disabled>X10</button></td>
+                                <td id="ch559_X10_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td>External pinheader X10</td>
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                <td>External pinheader X11</td>
+                                <td id="ch559_X11_data">&nbsp;&nbsp;&nbsp;</td>
+                                <td><button onclick="ch552_pin_func(-1,-1,11,this)" disabled>X11</button></td>
+                            </tr>
+                        </table>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+        </div>
+        <br>
+        <div class="control_jig_funcs" id="connect_pins_div" hidden>
+            Switch matrix pins:
+            <label id="connect_pin_x">&nbsp;&nbsp;&nbsp;</label>
+            and
+            <label id="connect_pin_y">&nbsp;&nbsp;&nbsp;</label>
+            <button onclick="ch559_connect_pins(1)">connect</button>
+            <button onclick="ch559_connect_pins(0)">disconnect</button>
+        </div>
+        <div class="control_jig_funcs" id="digital_write_div" hidden>
+            Digital write pin:
+            <label id="digital_write_pin">&nbsp;&nbsp;&nbsp;</label>
+            <button onclick="ch559_digital_write_pin(1)">High</button>
+            <button onclick="ch559_digital_write_pin(0)">Low</button>
+        </div>
+        <div class="control_jig_funcs" id="analog_write_div" hidden>
+            Analog write pin:
+            <label id="analog_write_pin">&nbsp;&nbsp;&nbsp;</label>
+            <input type="number" id="analog_write_value">
+            <button onclick="ch559_analog_write_pin()">Write</button>
+        </div>
+    </body>
+</html>

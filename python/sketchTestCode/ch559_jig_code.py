@@ -192,7 +192,7 @@ class CH559_jig:
             else:
                 return None
     
-    def analog_read(self, pin, wait_for_input_time=0):
+    def analog_read(self, pin, wait_for_input_time=1):
         command = f"A{pin:02d}\n"
         responseHeader = f"A{pin:02d}:"
         write_response = self.write_string_wait_for_response(command, responseHeader, wait_for_input_time)
