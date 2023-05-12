@@ -20,6 +20,9 @@ uint32_t analogPinSubscribedLastPrintTime = 0;
 char uart0RxBuffer[64];
 uint8_t uart0RxBufferPtr = 0;
 uint32_t uart0RxLastReceiveTime = 0;
+char uart1RxBuffer[64];
+uint8_t uart1RxBufferPtr = 0;
+uint32_t uart1RxLastReceiveTime = 0;
 
 void setup() {
   CH552_power(true);
@@ -88,19 +91,19 @@ void loop() {
           case 'R':
           case 'r':
             if (rxSerialBufferPtr == 3) {
-              uint8_t pin = hexToUchar(rxSerialBuffer[1])*10+hexToUchar(rxSerialBuffer[2]);
+              uint8_t pin = hexToUchar(rxSerialBuffer[1]) * 10 + hexToUchar(rxSerialBuffer[2]);
               uint8_t pinStatus = readPin(pin);
               USBSerial_print(rxSerialBuffer[0]);
               USBSerial_print(rxSerialBuffer[1]);
               USBSerial_print(rxSerialBuffer[2]);
               USBSerial_print((char)':');
-              if (pinStatus==PIN_ERROR){
+              if (pinStatus == PIN_ERROR) {
                 USBSerial_println("not valid");
-              }else{
-                USBSerial_println((char)('0'+pinStatus));
+              } else {
+                USBSerial_println((char)('0' + pinStatus));
                 if (rxSerialBuffer[0] == 'R') {
                   digitalPinSubscribed = 255;
-                }else{
+                } else {
                   digitalPinSubscribed = pin;
                   digitalPinSubscribedLastPrintTime = millis();
                 }
@@ -110,19 +113,19 @@ void loop() {
           case 'A':
           case 'a':
             if (rxSerialBufferPtr == 3) {
-              uint8_t pin = hexToUchar(rxSerialBuffer[1])*10+hexToUchar(rxSerialBuffer[2]);
+              uint8_t pin = hexToUchar(rxSerialBuffer[1]) * 10 + hexToUchar(rxSerialBuffer[2]);
               USBSerial_print(rxSerialBuffer[0]);
               USBSerial_print(rxSerialBuffer[1]);
               USBSerial_print(rxSerialBuffer[2]);
               USBSerial_print((char)':');
-              if (pin!=12){
+              if (pin != 12) {
                 USBSerial_println("not valid");
-              }else{
+              } else {
                 analogRead(pin);
                 USBSerial_println(analogRead(pin));
                 if (rxSerialBuffer[0] == 'A') {
                   analogPinSubscribed = 255;
-                }else{
+                } else {
                   analogPinSubscribed = pin;
                   analogPinSubscribedLastPrintTime = millis();
                 }
@@ -131,37 +134,37 @@ void loop() {
             break;
           case 'W':
             if (rxSerialBufferPtr == 4) {
-              uint8_t pin = hexToUchar(rxSerialBuffer[1])*10+hexToUchar(rxSerialBuffer[2]);
+              uint8_t pin = hexToUchar(rxSerialBuffer[1]) * 10 + hexToUchar(rxSerialBuffer[2]);
               uint8_t value = hexToUchar(rxSerialBuffer[3]);
               USBSerial_print(rxSerialBuffer[0]);
               USBSerial_print(rxSerialBuffer[1]);
               USBSerial_print(rxSerialBuffer[2]);
               USBSerial_print((char)':');
-              
-              uint8_t pinStatus = writePin(pin,value);
-              if (pinStatus==PIN_ERROR){
+
+              uint8_t pinStatus = writePin(pin, value);
+              if (pinStatus == PIN_ERROR) {
                 USBSerial_println("not valid");
-              }else{
-                USBSerial_println((char)('0'+pinStatus));
+              } else {
+                USBSerial_println((char)('0' + pinStatus));
               }
             }
             break;
           case 'w':
             if (rxSerialBufferPtr == 5) {
-              uint8_t pin = hexToUchar(rxSerialBuffer[1])*10+hexToUchar(rxSerialBuffer[2]);
+              uint8_t pin = hexToUchar(rxSerialBuffer[1]) * 10 + hexToUchar(rxSerialBuffer[2]);
               uint8_t value = hexToUchar2_xdata(&rxSerialBuffer[3]);
               USBSerial_print(rxSerialBuffer[0]);
               USBSerial_print(rxSerialBuffer[1]);
               USBSerial_print(rxSerialBuffer[2]);
               USBSerial_print((char)':');
-              if ( (pin==12) || (pin==25) ){
-                if (pin==25){
+              if ( (pin == 12) || (pin == 25) ) {
+                if (pin == 25) {
                   fastPWM2(value); //4K for P25
-                }else{
+                } else {
                   fastPWM3(value);  //20K for P12
                 }
                 USBSerial_println((int)value);
-              }else{
+              } else {
                 USBSerial_println("not valid");
               }
             }
@@ -173,21 +176,21 @@ void loop() {
               uint8_t baudrateMuliplexer = hexToUchar(rxSerialBuffer[1]);
               USBSerial_print(rxSerialBuffer[0]);
               USBSerial_print((char)':');
-              if (baudrateMuliplexer==0){
+              if (baudrateMuliplexer == 0) {
                 USBSerial_println("disable UART");
                 if (rxSerialBuffer[0] == 'T') {
-                  disableUART0();                                                                 
-                }else{
+                  disableUART0();
+                } else {
                   disableUART1();
                 }
-              }else if (baudrateMuliplexer>(115200/9600)){
+              } else if (baudrateMuliplexer > (115200 / 9600)) {
                 USBSerial_println("not valid rate");
-              }else{
-                __xdata uint32_t baudrate = 9600L*baudrateMuliplexer;
+              } else {
+                __xdata uint32_t baudrate = 9600L * baudrateMuliplexer;
                 if (rxSerialBuffer[0] == 'T') {
-                  PIN_FUNC|=bUART0_PIN_X; 
+                  PIN_FUNC |= bUART0_PIN_X;
                   Serial0_begin(baudrate);  //RXD0/TXD0 uses P0.2/P0.3
-                }else{
+                } else {
                   Serial1_begin(baudrate);  //RXD1/TXD1 uses P2.6/P2.7
                 }
                 USBSerial_println(baudrate);
@@ -197,20 +200,20 @@ void loop() {
           case 'U':
           case 'u':
             {
-              for (int i=1;i<rxSerialBufferPtr;i++){
+              for (int i = 1; i < rxSerialBufferPtr; i++) {
                 __data char charToSend = rxSerialBuffer[i];
-                if (charToSend == '\\'){
-                  if (rxSerialBuffer[i+1] == 'n'){
+                if (charToSend == '\\') {
+                  if (rxSerialBuffer[i + 1] == 'n') {
                     charToSend = '\n';
                     i++;
-                  }else if (rxSerialBuffer[i+1] == 'r'){
+                  } else if (rxSerialBuffer[i + 1] == 'r') {
                     charToSend = '\r';
                     i++;
                   }
                 }
                 if (rxSerialBuffer[0] == 'U') {
                   Serial0_write(charToSend);
-                }else{
+                } else {
                   Serial1_write(charToSend);
                 }
               }
@@ -234,7 +237,7 @@ void loop() {
 
   {
     __bit needToPrint = 0;
-    if (Serial0_available()){
+    if (Serial0_available()) {
       while (Serial0_available()) {
         __data char serialChar = Serial0_read();
         if (uart0RxBufferPtr < (64 - 1)) {
@@ -246,31 +249,31 @@ void loop() {
           }
         }
         uart0RxLastReceiveTime = millis();
-        if (serialChar == '\n'){
+        if (serialChar == '\n') {
           needToPrint = 1;
           break;
         }
       }
-    }else{
-      if (uart0RxBufferPtr>0){
-        if (((signed int)(millis()-uart0RxLastReceiveTime))>50){
+    } else {
+      if (uart0RxBufferPtr > 0) {
+        if (((signed int)(millis() - uart0RxLastReceiveTime)) > 50) {
           needToPrint = 1;
         }
       }
     }
 
-    if (needToPrint){
+    if (needToPrint) {
       USBSerial_write((char)'U');
       USBSerial_write((char)':');
-      for (__data uint8_t i=0;i<uart0RxBufferPtr;i++){
+      for (__data uint8_t i = 0; i < uart0RxBufferPtr; i++) {
         __data char charToPrint = uart0RxBuffer[i];
         if (charToPrint == '\n') {
           USBSerial_write((char)'\\');
           USBSerial_write((char)'n');
-        }else if (charToPrint == '\r'){
+        } else if (charToPrint == '\r') {
           USBSerial_write((char)'\\');
           USBSerial_write((char)'r');
-        }else{
+        } else {
           USBSerial_write(charToPrint);
         }
       }
@@ -279,45 +282,74 @@ void loop() {
     }
   }
 
-  if (Serial1_available()){
-    USBSerial_write((char)'u');
-    USBSerial_write((char)':');
-    while (Serial1_available()) {
-      __data char serialChar = Serial1_read();
-      if (serialChar == '\n') {
-        USBSerial_write((char)'\\');
-        USBSerial_write((char)'n');
-      }else if (serialChar == '\r'){
-        USBSerial_write((char)'\\');
-        USBSerial_write((char)'r');
-      }else{
-        USBSerial_write(serialChar);
+  {
+    __bit needToPrint = 0;
+    if (Serial1_available()) {
+      while (Serial1_available()) {
+        __data char serialChar = Serial1_read();
+        if (uart1RxBufferPtr < (64 - 1)) {
+          uart1RxBuffer[uart1RxBufferPtr] = serialChar;
+          uart1RxBufferPtr++;
+          if (uart1RxBufferPtr == (64 - 1)) {
+            needToPrint = 1;
+            break;
+          }
+        }
+        uart1RxLastReceiveTime = millis();
+        if (serialChar == '\n') {
+          needToPrint = 1;
+          break;
+        }
+      }
+    } else {
+      if (uart1RxBufferPtr > 0) {
+        if (((signed int)(millis() - uart1RxLastReceiveTime)) > 50) {
+          needToPrint = 1;
+        }
       }
     }
-    USBSerial_write((char)'\n');
+
+    if (needToPrint) {
+      USBSerial_write((char)'u');
+      USBSerial_write((char)':');
+      for (__data uint8_t i = 0; i < uart1RxBufferPtr; i++) {
+        __data char charToPrint = uart1RxBuffer[i];
+        if (charToPrint == '\n') {
+          USBSerial_write((char)'\\');
+          USBSerial_write((char)'n');
+        } else if (charToPrint == '\r') {
+          USBSerial_write((char)'\\');
+          USBSerial_write((char)'r');
+        } else {
+          USBSerial_write(charToPrint);
+        }
+      }
+      USBSerial_write((char)'\n');
+      uart1RxBufferPtr = 0;
+    }
   }
 
   USBSerial_flush();
 
   //repeat output of digital pin status if subscribed
-  if (digitalPinSubscribed!=255){
-    if (((int)(millis()-digitalPinSubscribedLastPrintTime))>25){
+  if (digitalPinSubscribed != 255) {
+    if (((int)(millis() - digitalPinSubscribedLastPrintTime)) > 25) {
       uint8_t pinStatus = readPin(digitalPinSubscribed);
       USBSerial_print((char)'r');
-      if (digitalPinSubscribed<10){
+      if (digitalPinSubscribed < 10) {
         USBSerial_print((char)'0');
       }
       USBSerial_print((int)digitalPinSubscribed);
       USBSerial_print((char)':');
-      USBSerial_println((char)('0'+pinStatus));
+      USBSerial_println((char)('0' + pinStatus));
       digitalPinSubscribedLastPrintTime = millis();
     }
   }
   //repeat output of analog pin status if subscribed
-  if (analogPinSubscribed!=255){
-    if (((int)(millis()-analogPinSubscribedLastPrintTime))>25){
+  if (analogPinSubscribed != 255) {
+    if (((int)(millis() - analogPinSubscribedLastPrintTime)) > 25) {
       USBSerial_print((char)'a');
-      if (analogPinSubscribed<10){
+      if (analogPinSubscribed < 10) {
         USBSerial_print((char)'0');
       }
       USBSerial_print((int)analogPinSubscribed);
@@ -327,5 +359,5 @@ void loop() {
       analogPinSubscribedLastPrintTime = millis();
     }
   }
-  
+
 }
