@@ -17,6 +17,10 @@ uint8_t analogPinSubscribed = 255;
 uint32_t digitalPinSubscribedLastPrintTime = 0;
 uint32_t analogPinSubscribedLastPrintTime = 0;
 
+char uart0RxBuffer[64];
+uint8_t uart0RxBufferPtr = 0;
+uint32_t uart0RxLastReceiveTime = 0;
+
 void setup() {
   CH552_power(true);
 
@@ -228,23 +232,53 @@ void loop() {
     }
   }
 
-  if (Serial0_available()){
-    USBSerial_write((char)'U');
-    USBSerial_write((char)':');
-    while (Serial0_available()) {
-      __data char serialChar = Serial0_read();
-      if (serialChar == '\n') {
-        USBSerial_write((char)'\\');
-        USBSerial_write((char)'n');
-      }else if (serialChar == '\r'){
-        USBSerial_write((char)'\\');
-        USBSerial_write((char)'r');
-      }else{
-        USBSerial_write(serialChar);
+  {
+    __bit needToPrint = 0;
+    if (Serial0_available()){
+      while (Serial0_available()) {
+        __data char serialChar = Serial0_read();
+        if (uart0RxBufferPtr < (64 - 1)) {
+          uart0RxBuffer[uart0RxBufferPtr] = serialChar;
+          uart0RxBufferPtr++;
+          if (uart0RxBufferPtr == (64 - 1)) {
+            needToPrint = 1;
+            break;
+          }
+        }
+        uart0RxLastReceiveTime = millis();
+        if (serialChar == '\n'){
+          needToPrint = 1;
+          break;
+        }
+      }
+    }else{
+      if (uart0RxBufferPtr>0){
+        if (((signed int)(millis()-uart0RxLastReceiveTime))>50){
+          needToPrint = 1;
+        }
       }
     }
-    USBSerial_write((char)'\n');
+
+    if (needToPrint){
+      USBSerial_write((char)'U');
+      USBSerial_write((char)':');
+      for (__data uint8_t i=0;i<uart0RxBufferPtr;i++){
+        __data char charToPrint = uart0RxBuffer[i];
+        if (charToPrint == '\n') {
+          USBSerial_write((char)'\\');
+          USBSerial_write((char)'n');
+        }else if (charToPrint == '\r'){
+          USBSerial_write((char)'\\');
+          USBSerial_write((char)'r');
+        }else{
+          USBSerial_write(charToPrint);
+        }
+      }
+      USBSerial_write((char)'\n');
+      uart0RxBufferPtr = 0;
+    }
   }
+
   if (Serial1_available()){
     USBSerial_write((char)'u');
     USBSerial_write((char)':');
