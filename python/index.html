@@ -266,6 +266,22 @@
                 xhttp.send();
             }
 
+            function ch559_uart0_write(appendChar){
+                var stringToWrite = document.getElementById("uart_send_data").value;
+                if (appendChar != null) {
+                    stringToWrite += appendChar;
+                }
+                stringToWrite = stringToWrite.replace(/\n/g, "\\n");
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log("ch559_uart0_write resp: "+xhttp.responseText);
+                    }
+                };
+                xhttp.open("GET", "ch559_uart0_write?data="+stringToWrite, true);
+                xhttp.send();
+            }
+
             function ch559_uart0_read(){
                 var xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function() {
@@ -497,7 +513,8 @@
             </select>
             <button onclick="ch559_uart0_connect()">connect</button>
             <input id="uart_send_data">
-            <button onclick="ch559_uart0_send()">send</button>
+            <button onclick="ch559_uart0_write('')">send</button>
+            <button onclick="ch559_uart0_write('\n')">sendNL</button>
             <label id="uart_receive_data">&nbsp;&nbsp;&nbsp;</label>
         </div>
     </body>

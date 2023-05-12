@@ -83,7 +83,10 @@ def ch559_uart0_connect_handler(parameters):
     mutiplier = int(parameters["baud"][0],16)
     return str(ch559_jig.init_uart0(mutiplier*9600))
 
-
+def ch559_uart0_write_handler(parameters):
+    string_to_send = parameters["data"][0]
+    ch559_jig.uart0_send_string(string_to_send)
+    return string_to_send
 
 def ch559_uart0_read_handler(parameters):
     ch559_jig.check_input()
@@ -99,7 +102,7 @@ web_response_dict["/ch559_analog_write"]=ch559_analog_write_handler
 web_response_dict["/ch559_reboot"]=ch559_reboot_handler
 web_response_dict["/ch559_bootloader"]=ch559_bootloader_handler
 web_response_dict["/ch559_uart0_connect"]=ch559_uart0_connect_handler
-#web_response_dict["/ch559_uart0_send"]=ch559_jig.send_uart0
+web_response_dict["/ch559_uart0_write"]=ch559_uart0_write_handler
 web_response_dict["/ch559_uart0_read"]=ch559_uart0_read_handler
 
 ch559_jig = CH559_jig()
