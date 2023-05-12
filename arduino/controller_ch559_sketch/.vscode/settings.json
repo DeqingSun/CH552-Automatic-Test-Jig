@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "type_traits": "c",
+        "typeinfo": "c",
+        "string_view": "c",
+        "util.h": "c"
+    }
+}
