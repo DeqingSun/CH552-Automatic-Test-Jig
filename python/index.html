@@ -14,6 +14,8 @@
             var connect_pin_y = -1;
             var digital_write_pin = -1;
             var analog_write_pin = -1;
+            var uart_read_timeout_id = -1;
+            var uart_read_enabled = false; 
 
             function hide_all_func_div_except(except_str){
                 var x = document.getElementsByClassName("control_jig_funcs");
@@ -85,6 +87,8 @@
                 };
                 xhttp.open("GET", "ch559_init", true);
                 xhttp.send();
+                clearTimeout(uart_read_timeout_id);
+                uart_read_enabled = false; 
             }
 
             function connect_pins_func() {
@@ -245,6 +249,13 @@
 
             function ch559_uart0_connect() {
                 var parameter = document.getElementById("uart0_baudrate_select").value;
+                if (parameter == "0") {
+                    clearTimeout(uart_read_timeout_id);
+                    uart_read_enabled = false; 
+                }else{
+                    uart_read_timeout_id = setTimeout(ch559_uart0_read, 10);
+                    uart_read_enabled = true;
+                }
                 var xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
@@ -252,6 +263,23 @@
                     }
                 };
                 xhttp.open("GET", "ch559_uart0_connect?baud="+parameter, true);
+                xhttp.send();
+            }
+
+            function ch559_uart0_read(){
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        if (xhttp.responseText.length > 0) {
+                            console.log("reboot_func resp: "+xhttp.responseText);
+                            document.getElementById("uart_receive_data").innerHTML = xhttp.responseText.trim().split("\n").pop();
+                        }
+                        if (uart_read_enabled){
+                            uart_read_timeout_id = setTimeout(ch559_uart0_read, 20);
+                        }
+                    }
+                };
+                xhttp.open("GET", "ch559_uart0_read", true);
                 xhttp.send();
             }
 
@@ -468,9 +496,9 @@
                 <option value="C">115200</option>
             </select>
             <button onclick="ch559_uart0_connect()">connect</button>
-            <label id="analog_write_pin">&nbsp;&nbsp;&nbsp;</label>
-            <input type="number" id="analog_write_value">
-            
+            <input id="uart_send_data">
+            <button onclick="ch559_uart0_send()">send</button>
+            <label id="uart_receive_data">&nbsp;&nbsp;&nbsp;</label>
         </div>
     </body>
 </html>
