@@ -117,6 +117,12 @@
                 hide_all_ch559_ch552_button_except_start_with(["P1.2","P2.5"],"no match");
             }
 
+            function uart0_func() {
+                hide_all_func_div_except("uart0_div");
+                current_func = "uart0"
+                hide_all_ch559_ch552_button_except_start_with("no match","no match");
+            }
+
             function ch559_pin_func(port, pin, map_pin, button_obj) {
                 button_str = button_obj.innerHTML;
                 if (current_func == "connect_pins"){
@@ -237,6 +243,18 @@
                 xhttp.send();
             }
 
+            function ch559_uart0_connect() {
+                var parameter = document.getElementById("uart0_baudrate_select").value;
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log("ch559_uart0_connect_xmlrequest resp: "+xhttp.responseText);
+                    }
+                };
+                xhttp.open("GET", "ch559_uart0_connect?baud="+parameter, true);
+                xhttp.send();
+            }
+
             function reboot_func() {
                 var xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function() {
@@ -270,6 +288,7 @@
             <button onclick="digital_write_func()">Digital Write</button>
             <button onclick="analog_read_func()">Analog Read</button>
             <button onclick="analog_write_func()">Analog Write</button>
+            <button onclick="uart0_func()">UART0</button>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <button onclick="reboot_func()">Reboot</button>
             <button onclick="init_bootloader_func()">Init & Bootloader</button>
@@ -437,6 +456,21 @@
             <label id="analog_write_pin">&nbsp;&nbsp;&nbsp;</label>
             <input type="number" id="analog_write_value">
             <button onclick="ch559_analog_write_pin()">Write</button>
+        </div>
+        <div class="control_jig_funcs" id="uart0_div" hidden>
+            UART0 on P0.2 P0.3. BaudRate:
+            <select id="uart0_baudrate_select">
+                <option value="0">Disable</option>
+                <option value="1">9600</option>
+                <option value="2">19200</option>
+                <option value="4">38400</option>
+                <option value="6">57600</option>
+                <option value="C">115200</option>
+            </select>
+            <button onclick="ch559_uart0_connect()">connect</button>
+            <label id="analog_write_pin">&nbsp;&nbsp;&nbsp;</label>
+            <input type="number" id="analog_write_value">
+            
         </div>
     </body>
 </html>

@@ -79,6 +79,10 @@ def ch559_reboot_handler(parameters):
 def ch559_bootloader_handler(parameters):
     return str(ch559_jig.enter_bootloader_mode())
 
+def ch559_uart0_connect_handler(parameters):
+    mutiplier = int(parameters["baud"][0],16)
+    return str(ch559_jig.init_uart0(mutiplier*9600))
+
 web_response_dict["/"]=root_page_handler
 web_response_dict["/ch559_init"]=ch559_init_handler      
 web_response_dict["/ch559_connect_pins"]=ch559_connect_pins_handler
@@ -88,6 +92,7 @@ web_response_dict["/ch559_analog_read"]=ch559_analog_read_handler
 web_response_dict["/ch559_analog_write"]=ch559_analog_write_handler
 web_response_dict["/ch559_reboot"]=ch559_reboot_handler
 web_response_dict["/ch559_bootloader"]=ch559_bootloader_handler
+web_response_dict["/ch559_uart0_connect"]=ch559_uart0_connect_handler
 
 ch559_jig = CH559_jig()
 ch559_jig.connect()
