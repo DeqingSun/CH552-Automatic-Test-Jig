@@ -301,9 +301,10 @@ class CH559_jig:
         self.write_string_wait_for_response(command, "", 0)
         return
     
-    def uart0_get_buffered_string(self):
+    def uart0_get_buffered_string(self, escape_characters=True):
         buffer_string = self.uart0_buffer
         self.uart0_buffer = ""
-        buffer_string = buffer_string.replace("\\n", "\n")
-        buffer_string = buffer_string.replace("\\r", "\r")
+        if (escape_characters):
+            buffer_string = buffer_string.replace("\\n", "\n")
+            buffer_string = buffer_string.replace("\\r", "\r")
         return buffer_string
