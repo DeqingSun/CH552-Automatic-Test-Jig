@@ -20,11 +20,16 @@ void CH552_enter_bootloader(){
     delay(CH552_REBOOT_POWEDOWN_TIME);
     pinMode(32, OUTPUT);
     digitalWrite(32, HIGH);
-    pinMode(27, LOW);
+    pinMode(27, OUTPUT);
     digitalWrite(27, LOW);
     CH446Q_switch_channel(CH446_X_CH552_DP_PULLUP, CH446_Y_CH559_P32, true);
     CH446Q_switch_channel(CH446_X_CH552_P15, CH446_Y_CH559_P27, true);
     CH552_power(1); 
+    delay(CH552_REBOOT_POWEDOWN_TIME);
+    pinMode(32, INPUT);
+    pinMode(27, INPUT);
+    CH446Q_switch_channel(CH446_X_CH552_DP_PULLUP, CH446_Y_CH559_P32, false);
+    CH446Q_switch_channel(CH446_X_CH552_P15, CH446_Y_CH559_P27, false);
 }
 
 void CH552_reboot_usercode(){
