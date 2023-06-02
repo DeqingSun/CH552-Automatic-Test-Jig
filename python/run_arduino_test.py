@@ -144,16 +144,24 @@ if need_to_test:
             exit(1)
         ch559_jig.disconnect()
         del ch559_jig
-        #use vnproch55x to upload the hex file
-        upload_process = subprocess.Popen([upload_tool_path,"-r","2",hex_file], stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        out, err = upload_process.communicate() 
-        return_code = upload_process.wait()
-        if return_code == 0:
-            print(f"Upload of {hex_file} completed after {time.monotonic()-start_time:.2f} seconds")
-        else:
-            print(f"Error uploading {hex_file}")
-            with open(error_log_file, 'a') as error_log:
-                error_log.write(f"Error uploading {hex_file}\n")
+        upload_success = False
+        for upload_attempt in range(3):
+            #use vnproch55x to upload the hex file
+            upload_process = subprocess.Popen([upload_tool_path,"-r","2",hex_file], stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            out, err = upload_process.communicate() 
+            return_code = upload_process.wait()
+            if return_code == 0:
+                print(f"Upload of {hex_file} completed after {time.monotonic()-start_time:.2f} seconds")
+                upload_success = True
+                break
+            else:
+                print(f"Error uploading {hex_file}")
+                with open(error_log_file, 'a') as error_log:
+                    error_log.write(f"Error uploading {hex_file}\n")
+                print(f"Try again {upload_attempt+1}/3")
+                time.sleep(1)
+        if not upload_success:
+            print(f"Upload of {hex_file} failed after 3 tries.")
             exit(1)
         test_process = subprocess.Popen(["python",test_script_path], stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = test_process.communicate() 
