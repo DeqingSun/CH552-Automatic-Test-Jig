@@ -83,6 +83,10 @@
                 xhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
                         console.log("init_func resp: "+xhttp.responseText);
+                        if (xhttp.responseText == "True") {
+                            var d = new Date();
+                            document.getElementById("command_status_data").innerHTML = "Init OK at " + d.getHours()+":"+d.getMinutes()+":"+d.getSeconds();
+                        }
                     }
                 };
                 xhttp.open("GET", "ch559_init", true);
@@ -189,6 +193,10 @@
                 xhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
                         console.log("ch559_connect_pins resp: "+xhttp.responseText);
+                        if (xhttp.responseText == "True") {
+                            var d = new Date();
+                            document.getElementById("command_status_data").innerHTML = "Connect pin OK at " + d.getHours()+":"+d.getMinutes()+":"+d.getSeconds();
+                        }
                     }
                 };
                 xhttp.open("GET", "ch559_connect_pins?conn="+conn+"&x="+connect_pin_x+"&y="+connect_pin_y, true);
@@ -201,6 +209,8 @@
                     if (this.readyState == 4 && this.status == 200) {
                         console.log("ch559_digital_read_xmlrequest resp: "+xhttp.responseText);
                         document.getElementById("ch559_P"+port+pin+"_data").innerHTML = (xhttp.responseText.substring(0, 1)=="T")?"H":"L";
+                        var d = new Date();
+                        document.getElementById("command_status_data").innerHTML = "Digital Read OK at " + d.getHours()+":"+d.getMinutes()+":"+d.getSeconds();
                     }
                 };
                 xhttp.open("GET", "ch559_digital_read?pin="+(port*10+pin), true);
@@ -214,6 +224,8 @@
                         console.log("ch559_digital_write_xmlrequest resp: "+xhttp.responseText);
                         if (xhttp.responseText == "True") {
                             document.getElementById("ch559_P"+port+pin+"_data").innerHTML = (value>0)?"H":"L";
+                            var d = new Date();
+                            document.getElementById("command_status_data").innerHTML = "Digital Write OK at " + d.getHours()+":"+d.getMinutes()+":"+d.getSeconds();
                         }
                     }
                 };
@@ -227,6 +239,8 @@
                     if (this.readyState == 4 && this.status == 200) {
                         console.log("ch559_analog_read_xmlrequest resp: "+xhttp.responseText);
                         document.getElementById("ch559_P"+port+pin+"_data").innerHTML = xhttp.responseText;
+                        var d = new Date();
+                        document.getElementById("command_status_data").innerHTML = "Analog Read OK at " + d.getHours()+":"+d.getMinutes()+":"+d.getSeconds();
                     }
                 };
                 xhttp.open("GET", "ch559_analog_read?pin="+(port*10+pin), true);
@@ -240,6 +254,8 @@
                         console.log("ch559_analog_write_xmlrequest resp: "+xhttp.responseText);
                         if (xhttp.responseText == "True") {
                             document.getElementById("ch559_P"+port+pin+"_data").innerHTML = (value);
+                            var d = new Date();
+                            document.getElementById("command_status_data").innerHTML = "Analog Write OK at " + d.getHours()+":"+d.getMinutes()+":"+d.getSeconds();
                         }
                     }
                 };
@@ -260,6 +276,10 @@
                 xhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
                         console.log("ch559_uart0_connect_xmlrequest resp: "+xhttp.responseText);
+                        if (!isNaN(xhttp.responseText)) {
+                            var d = new Date();
+                            document.getElementById("command_status_data").innerHTML = "UART0 set to " + xhttp.responseText + " at " + d.getHours()+":"+d.getMinutes()+":"+d.getSeconds();
+                        }
                     }
                 };
                 xhttp.open("GET", "ch559_uart0_connect?baud="+parameter, true);
@@ -304,17 +324,25 @@
                 xhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
                         console.log("reboot_func resp: "+xhttp.responseText);
+                        if (xhttp.responseText == "True") {
+                            var d = new Date();
+                            document.getElementById("command_status_data").innerHTML = "Reboot OK at " + d.getHours()+":"+d.getMinutes()+":"+d.getSeconds();
+                        }
                     }
                 };
                 xhttp.open("GET", "ch559_reboot", true);
                 xhttp.send();
             }
 
-            function init_bootloader_func() {
+            function bootloader_func() {
                 var xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
-                        console.log("init_bootloader_func resp: "+xhttp.responseText);
+                        console.log("bootloader_func resp: "+xhttp.responseText);
+                        if (xhttp.responseText == "True") {
+                            var d = new Date();
+                            document.getElementById("command_status_data").innerHTML = "Bootloader OK at " + d.getHours()+":"+d.getMinutes()+":"+d.getSeconds();
+                        }
                     }
                 };
                 xhttp.open("GET", "ch559_bootloader", true);
@@ -335,7 +363,9 @@
             <button onclick="uart0_func()">UART0</button>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <button onclick="reboot_func()">Reboot</button>
-            <button onclick="init_bootloader_func()">Init & Bootloader</button>
+            <button onclick="bootloader_func()">Bootloader</button>
+            <br>
+            <label id="command_status_data">&nbsp;&nbsp;&nbsp;</label>
         </div>
         <br>
         <div id="pin_select">
