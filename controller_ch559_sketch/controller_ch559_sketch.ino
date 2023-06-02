@@ -23,6 +23,8 @@ uint32_t uart0RxLastReceiveTime = 0;
 char uart1RxBuffer[64];
 uint8_t uart1RxBufferPtr = 0;
 uint32_t uart1RxLastReceiveTime = 0;
+volatile __bit rebootTargetInsteadOfSelfOn1200 = false;
+volatile __bit needRebootTargetFlag = false;
 
 void setup() {
   CH552_power(true);
@@ -80,6 +82,14 @@ void loop() {
             if (rxSerialBufferPtr == 1) {
               CH552_enter_bootloader();
               USBSerial_println("B: CH552 boot mode");
+            }else if (rxSerialBufferPtr == 2) {
+              if (rxSerialBuffer[1] == 'E'){
+                rebootTargetInsteadOfSelfOn1200 = true;
+                USBSerial_println("BE: CH552 reboot target on 1200");
+              }else if (rxSerialBuffer[1] == 'e'){
+                rebootTargetInsteadOfSelfOn1200 = false;
+                USBSerial_println("Be: CH552 reboot self on 1200");
+              }
             }
             break;
           case 'b':
@@ -358,6 +368,12 @@ void loop() {
       USBSerial_println(analogRead(analogPinSubscribed));
       analogPinSubscribedLastPrintTime = millis();
     }
+  }
+
+  //reboot target take too long time to run in USB interrupt
+  if (needRebootTargetFlag) {
+    CH552_enter_bootloader();
+    needRebootTargetFlag = false;
   }
 
 }

@@ -19,6 +19,9 @@ volatile __xdata uint8_t controlLineState = 0;
 
 __xdata uint8_t usbWritePointer = 0;
 
+extern volatile __bit rebootTargetInsteadOfSelfOn1200;
+extern volatile __bit needRebootTargetFlag;
+
 void delayMicroseconds(__data uint16_t us);
 
 void USBInit(){
@@ -61,29 +64,34 @@ void setControlLineStateHandler(){
     // We check DTR state to determine if host port is open (bit 0 of lineState).
     if ( ((controlLineState & 0x01) == 0) && (*((__xdata uint32_t *)LineCoding) == 1200) ){ //both linecoding and sdcc are little-endian
 
+        if (rebootTargetInsteadOfSelfOn1200){
+            needRebootTargetFlag = 1;
+        }else{
+
 #if BOOT_LOAD_ADDR == 0x3800
-        USB_CTRL = 0;
-        EA = 0;                     //Disabling all interrupts is required.
-        TMOD = 0;
-        delayMicroseconds(50000);
-        delayMicroseconds(50000);
-        
-        __asm__ ("lcall #0x3800");  //Jump to bootloader code
-        
-        while(1);
+            USB_CTRL = 0;
+            EA = 0;                     //Disabling all interrupts is required.
+            TMOD = 0;
+            delayMicroseconds(50000);
+            delayMicroseconds(50000);
+            
+            __asm__ ("lcall #0x3800");  //Jump to bootloader code
+            
+            while(1);
 #elif defined(CH559) && (BOOT_LOAD_ADDR == 0xF400)
-        USB_CTRL = 0;
-        EA = 0;                     //Disabling all interrupts is required.
-        delayMicroseconds(50000);
-        delayMicroseconds(50000);
-        
-        __asm__ ("lcall #0xF400");  //Jump to bootloader code
-        
-        while(1);
+            USB_CTRL = 0;
+            EA = 0;                     //Disabling all interrupts is required.
+            delayMicroseconds(50000);
+            delayMicroseconds(50000);
+            
+            __asm__ ("lcall #0xF400");  //Jump to bootloader code
+            
+            while(1);
 #elif BOOT_LOAD_ADDR == 0xF400
-        //todo: not working well, CH549 doesn't support direct jump
+            //todo: not working well, CH549 doesn't support direct jump
 #endif
         
+        }
     }
     
 }
