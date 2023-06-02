@@ -33,6 +33,7 @@ class CH559_jig:
         self.serial_port = None
         self.serial_buffer = ""
         self.uart0_buffer = ""
+        self.print_serial_input = False
         
 
     def connect(self):
@@ -73,7 +74,8 @@ class CH559_jig:
             part_after_newline = input_string[pos_newline+1:]
             self.serial_buffer = self.serial_buffer+part_before_newline
             if (len(self.serial_buffer)>0):
-                #print(self.serial_buffer)
+                if (self.print_serial_input):
+                    print(self.serial_buffer)
                 if (self.serial_buffer.startswith("U:")):
                     self.uart0_buffer = self.uart0_buffer + self.serial_buffer[2:].strip("\n\r")
                 return_list.append(self.serial_buffer.strip())
@@ -253,15 +255,9 @@ class CH559_jig:
                 return None
             
     def enter_bootloader_mode(self):
-        #force wait
-        if self.initailize(wait_for_input_time=1) == False:
-            return False
         command = "B\n"
         write_response = self.write_string_wait_for_response(command, "B:", 1)
         if (len(write_response)==0):
-            return False
-        time.sleep(0.05)
-        if self.initailize(wait_for_input_time=1) == False:
             return False
         return True
     

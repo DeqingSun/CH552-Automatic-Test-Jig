@@ -310,11 +310,11 @@
                 xhttp.send();
             }
 
-            function init_bootloader_func() {
+            function bootloader_func() {
                 var xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
-                        console.log("init_bootloader_func resp: "+xhttp.responseText);
+                        console.log("bootloader_func resp: "+xhttp.responseText);
                     }
                 };
                 xhttp.open("GET", "ch559_bootloader", true);
@@ -335,7 +335,7 @@
             <button onclick="uart0_func()">UART0</button>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <button onclick="reboot_func()">Reboot</button>
-            <button onclick="init_bootloader_func()">Init & Bootloader</button>
+            <button onclick="bootloader_func()">Bootloader</button>
         </div>
         <br>
         <div id="pin_select">

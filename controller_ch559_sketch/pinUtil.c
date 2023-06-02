@@ -14,6 +14,7 @@ void CH552_power(__data uint8_t on_off){
 }
 
 void CH552_enter_bootloader(){
+    CH446Q_save_matrix();
     CH446Q_reset();
     CH552_power(0); //cut power to CH552
     //use CH559_P32 to pull up CH552_P3.6,  CH559_P27 to pull down CH552_P1.5
@@ -28,8 +29,7 @@ void CH552_enter_bootloader(){
     delay(CH552_REBOOT_POWEDOWN_TIME);
     pinMode(32, INPUT);
     pinMode(27, INPUT);
-    CH446Q_switch_channel(CH446_X_CH552_DP_PULLUP, CH446_Y_CH559_P32, false);
-    CH446Q_switch_channel(CH446_X_CH552_P15, CH446_Y_CH559_P27, false);
+    CH446Q_restore_matrix();
 }
 
 void CH552_reboot_usercode(){

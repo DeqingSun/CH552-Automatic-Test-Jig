@@ -37,5 +37,7 @@
 void CH446Q_init();
 void CH446Q_reset();
 void CH446Q_switch_channel(__data uint8_t x, __xdata uint8_t y, __xdata uint8_t status);
+void CH446Q_save_matrix();
+void CH446Q_restore_matrix();
 
 #endif

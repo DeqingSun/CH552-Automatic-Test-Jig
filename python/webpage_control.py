@@ -2,6 +2,7 @@ import http.server
 import socketserver
 import urllib.parse
 import time
+import os
 
 from sketchTestCode.ch559_jig_code import CH559_jig
 
@@ -105,7 +106,11 @@ web_response_dict["/ch559_uart0_connect"]=ch559_uart0_connect_handler
 web_response_dict["/ch559_uart0_write"]=ch559_uart0_write_handler
 web_response_dict["/ch559_uart0_read"]=ch559_uart0_read_handler
 
+#change working directory to script directory
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 ch559_jig = CH559_jig()
+ch559_jig.print_serial_input = True
 ch559_jig.connect()
 
 Handler = GetHandler
