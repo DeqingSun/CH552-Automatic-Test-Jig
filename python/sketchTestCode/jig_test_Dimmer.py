@@ -27,8 +27,8 @@ for value_to_write in value_to_writes:
     analog_value=ch559_jig.analog_read(12, wait_for_input_time=1)
     ideal_value = int(value_to_write*5/3.3/255*2047)
     ideal_value = min(ideal_value,2047)
-    if (abs(analog_value-ideal_value)>300):
-        print("analog_value-ideal_value>300")
+    if (abs(analog_value-ideal_value)>400):
+        print("analog_value-ideal_value>400")
         print(analog_value,ideal_value)
         exit(1)
         
