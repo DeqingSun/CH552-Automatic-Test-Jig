@@ -111,7 +111,8 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 ch559_jig = CH559_jig()
 ch559_jig.print_serial_input = True
-ch559_jig.connect()
+if not ch559_jig.connect():
+    exit()
 
 Handler = GetHandler
 socketserver.TCPServer.allow_reuse_address = True   #debugging, avoid port in use shortly after restart script
