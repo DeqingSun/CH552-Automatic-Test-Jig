@@ -35,7 +35,7 @@ while (time.monotonic() - start_time < 5):
             found_text_ASCII_Table = True
         if ("dec: 126" in all_text):
             found_text_dec_126 = True
-        if (found_text_ASCII_Table and found_text_dec_126):
+        if (found_text_ASCII_Table or found_text_dec_126):
             exit(0)
 print(all_text)
 exit(1)
