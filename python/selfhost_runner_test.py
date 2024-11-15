@@ -65,13 +65,15 @@ for firmware in compiled_firmwares:
         if (not ch559_jig.enter_bootloader_mode()):
             print("CH559 jig enter_bootloader_mode failed")
             exit(1)
+        bootloader_enter_time = time.monotonic()
         ch559_jig.disconnect()
         del ch559_jig
         upload_success = False
         time.sleep(0.5)
         for upload_attempt in range(3):
             #use vnproch55x to upload the hex file
-            upload_process = subprocess.Popen([upload_tool_path,"-r","1","-t","CH552",firmware], stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            upload_start_time = time.monotonic()
+            upload_process = subprocess.Popen([upload_tool_path,"-r","2","-t","CH552",firmware], stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             out, err = upload_process.communicate() 
             return_code = upload_process.wait()
             if return_code == 0:
@@ -82,6 +84,14 @@ for firmware in compiled_firmwares:
                 print(f"Error uploading {hex_sketch_name}")
                 print(out.decode('utf-8'))
                 print(err.decode('utf-8'))
+                upload_fail_time = time.monotonic()
+                print(f"Upload started after {upload_start_time-start_time:.2f} seconds")
+                print(f"Upload failed after {upload_fail_time-upload_start_time:.2f} seconds")
+                #print return value of lsusb
+                lsusb_process = subprocess.Popen(["lsusb"], stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                out, err = lsusb_process.communicate()
+                print("lsusb output:")
+                print(out.decode('utf-8'))
                 print(f"Try again {upload_attempt+1}/3")
                 time.sleep(0.5)
 
