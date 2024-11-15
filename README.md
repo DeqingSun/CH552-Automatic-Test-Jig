@@ -50,6 +50,7 @@ Run following commands:
 echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="4348", ATTRS{idProduct}=="55e0", MODE="0666"' | sudo tee /etc/udev/rules.d/90-ch551-bl.rules > /dev/null
 sudo apt install python3-usb
 sudo apt install python3-serial
+sudo apt install git
 
 mkdir actions-runner && cd actions-runner
 curl -o actions-runner-linux-arm64-2.320.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.320.0/actions-runner-linux-arm64-2.320.0.tar.gz
