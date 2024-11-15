@@ -57,20 +57,20 @@ for firmware in compiled_firmwares:
             continue
         print(f"Now testing {hex_sketch_name}")
         start_time = time.monotonic()
-        #use ch559_jig_code to reboot the CH552 into bootloader mode
-        # sketchTestCode is a package in the "test_script_directory" directory
-        from ch559_jig_code import CH559_jig
-        ch559_jig = CH559_jig()
-        ch559_jig.connect()
-        if (not ch559_jig.enter_bootloader_mode()):
-            print("CH559 jig enter_bootloader_mode failed")
-            exit(1)
-        bootloader_enter_time = time.monotonic()
-        ch559_jig.disconnect()
-        del ch559_jig
         upload_success = False
-        time.sleep(0.5)
         for upload_attempt in range(3):
+            #use ch559_jig_code to reboot the CH552 into bootloader mode
+            # sketchTestCode is a package in the "test_script_directory" directory
+            from ch559_jig_code import CH559_jig
+            ch559_jig = CH559_jig()
+            ch559_jig.connect()
+            if (not ch559_jig.enter_bootloader_mode()):
+                print("CH559 jig enter_bootloader_mode failed")
+                exit(1)
+            bootloader_enter_time = time.monotonic()
+            ch559_jig.disconnect()
+            del ch559_jig
+            #time.sleep(0.5)
             #use vnproch55x to upload the hex file
             upload_start_time = time.monotonic()
             upload_process = subprocess.Popen([upload_tool_path,"-r","2","-t","CH552",firmware], stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -85,8 +85,8 @@ for firmware in compiled_firmwares:
                 print(out.decode('utf-8'))
                 print(err.decode('utf-8'))
                 upload_fail_time = time.monotonic()
-                print(f"Upload started after {upload_start_time-start_time:.2f} seconds")
-                print(f"Upload failed after {upload_fail_time-upload_start_time:.2f} seconds")
+                print(f"Upload started after {upload_start_time-bootloader_enter_time:.2f} seconds")
+                print(f"Upload failed after {upload_fail_time-bootloader_enter_time:.2f} seconds")
                 #print return value of lsusb
                 lsusb_process = subprocess.Popen(["lsusb"], stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 out, err = lsusb_process.communicate()
