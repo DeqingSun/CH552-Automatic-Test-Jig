@@ -47,7 +47,8 @@ failure_count = 0
 for firmware in compiled_firmwares:
     triedTimes = 0
     passedTest = False
-    while triedTimes < 3:
+    while (triedTimes < 3) and (not passedTest):
+        triedTimes += 1
         hex_sketch_name = os.path.basename(firmware).split(".")[0]
         test_script_path = os.path.join(test_script_directory, "jig_test_"+hex_sketch_name+".py")
         if not os.path.isfile(test_script_path):
