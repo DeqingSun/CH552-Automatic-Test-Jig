@@ -45,56 +45,62 @@ success_count = 0
 failure_count = 0
 
 for firmware in compiled_firmwares:
-    hex_sketch_name = os.path.basename(firmware).split(".")[0]
-    test_script_path = os.path.join(test_script_directory, "jig_test_"+hex_sketch_name+".py")
-    if not os.path.isfile(test_script_path):
-        print(f"Test script not found at {test_script_path} for {hex_sketch_name}")
-        failure_count += 1
-        continue
-    print(f"Now testing {hex_sketch_name}")
-    start_time = time.monotonic()
-    #use ch559_jig_code to reboot the CH552 into bootloader mode
-    # sketchTestCode is a package in the "test_script_directory" directory
-    from ch559_jig_code import CH559_jig
-    ch559_jig = CH559_jig()
-    ch559_jig.connect()
-    if (not ch559_jig.enter_bootloader_mode()):
-        print("CH559 jig enter_bootloader_mode failed")
-        exit(1)
-    ch559_jig.disconnect()
-    del ch559_jig
-    upload_success = False
-    time.sleep(0.5)
-    for upload_attempt in range(3):
-        #use vnproch55x to upload the hex file
-        upload_process = subprocess.Popen([upload_tool_path,"-r","1","-t","CH552",firmware], stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        out, err = upload_process.communicate() 
-        return_code = upload_process.wait()
+    triedTimes = 0
+    passedTest = False
+    while triedTimes < 3:
+        hex_sketch_name = os.path.basename(firmware).split(".")[0]
+        test_script_path = os.path.join(test_script_directory, "jig_test_"+hex_sketch_name+".py")
+        if not os.path.isfile(test_script_path):
+            print(f"Test script not found at {test_script_path} for {hex_sketch_name}")
+            triedTimes = 99
+            continue
+        print(f"Now testing {hex_sketch_name}")
+        start_time = time.monotonic()
+        #use ch559_jig_code to reboot the CH552 into bootloader mode
+        # sketchTestCode is a package in the "test_script_directory" directory
+        from ch559_jig_code import CH559_jig
+        ch559_jig = CH559_jig()
+        ch559_jig.connect()
+        if (not ch559_jig.enter_bootloader_mode()):
+            print("CH559 jig enter_bootloader_mode failed")
+            exit(1)
+        ch559_jig.disconnect()
+        del ch559_jig
+        upload_success = False
+        time.sleep(0.5)
+        for upload_attempt in range(3):
+            #use vnproch55x to upload the hex file
+            upload_process = subprocess.Popen([upload_tool_path,"-r","1","-t","CH552",firmware], stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            out, err = upload_process.communicate() 
+            return_code = upload_process.wait()
+            if return_code == 0:
+                print(f"Upload of {hex_sketch_name} completed after {time.monotonic()-start_time:.2f} seconds")
+                upload_success = True
+                break
+            else:
+                print(f"Error uploading {hex_sketch_name}")
+                print(out.decode('utf-8'))
+                print(err.decode('utf-8'))
+                print(f"Try again {upload_attempt+1}/3")
+                time.sleep(0.5)
+
+        if not upload_success:
+            print(f"Upload of {hex_sketch_name} failed after 3 tries.")
+            exit(1)
+
+        test_process = subprocess.Popen(["python",test_script_path], stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = test_process.communicate() 
+        return_code = test_process.wait()
         if return_code == 0:
-            print(f"Upload of {hex_sketch_name} completed after {time.monotonic()-start_time:.2f} seconds")
-            upload_success = True
-            break
+            print(f"Test of {hex_sketch_name} completed after {time.monotonic()-start_time:.2f} seconds")
+            passedTest = True
         else:
-            print(f"Error uploading {hex_sketch_name}")
+            print(f"Error testing {hex_sketch_name}")
             print(out.decode('utf-8'))
             print(err.decode('utf-8'))
-            print(f"Try again {upload_attempt+1}/3")
-            time.sleep(0.5)
-
-    if not upload_success:
-        print(f"Upload of {hex_sketch_name} failed after 3 tries.")
-        exit(1)
-
-    test_process = subprocess.Popen(["python",test_script_path], stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = test_process.communicate() 
-    return_code = test_process.wait()
-    if return_code == 0:
-        print(f"Test of {hex_sketch_name} completed after {time.monotonic()-start_time:.2f} seconds")
+    if passedTest:
         success_count += 1
     else:
-        print(f"Error testing {hex_sketch_name}")
-        print(out.decode('utf-8'))
-        print(err.decode('utf-8'))
         failure_count += 1
     
 print(f"Test completed. Success: {success_count}, Failure: {failure_count}")

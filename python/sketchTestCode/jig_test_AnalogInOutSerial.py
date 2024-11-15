@@ -42,6 +42,7 @@ for input_value in input_values:
     if (abs(sensor_value - ideal_output_value) > 10):
         print("CH552 serial sensor_value not right")
         print(sensor_value,output_value,ideal_output_value)
+        print("sensor_value="+str(sensor_value)+" output_value="+str(output_value)+" ideal_output_value="+str(ideal_output_value))
         exit(1)
 
     analog_value = ch559_jig.analog_read(12, wait_for_input_time=1)
