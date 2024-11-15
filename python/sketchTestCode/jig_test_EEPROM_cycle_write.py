@@ -42,7 +42,10 @@ while ( (time.monotonic() - start_time) < 15 and not eeprom_check_ok):
 
                     if len(eeprom_data) == 128:
                         print(f"EEPROM data finish read on {time.monotonic()-start_time:02f}:")
+                        print("eeprom_data length: "+str(len(eeprom_data)))
                         print((eeprom_data))
+                        print("eeprom_data_old length: "+str(len(eeprom_data_old)))
+                        print((eeprom_data_old))
                         if len(eeprom_data_old) == 128:
                             #check difference between old and new data
                             for i in range(128):
