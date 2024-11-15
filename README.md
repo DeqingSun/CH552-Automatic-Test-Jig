@@ -39,3 +39,61 @@ Also, another script exposes the CH559 chip to a webpage. And it is easier to us
 ![Github Action flow](https://raw.githubusercontent.com/DeqingSun/CH552-Automatic-Test-Jig/main/img/github_action_flow.png)
 
 The [CH55xduino project](https://github.com/DeqingSun/ch55xduino) uses this project for automatic testing. As a public repo, CH55xduino has access to free GitHub-hosted runners. So the CH55xduino utilizes the GitHub-hosted runners to do clang-format checks and Arduino code compilation on the cloud with Arduino Cli to verify if all examples can be compiled successfully on each GitHub push. Then all compiled hex files are packed and uploaded as artifacts. Then the self-hosted runner on Raspberry Pi will take over the artifacts from cloud runner to bypass all Arduino compilation steps and use [selfhost_runner_test.py](https://github.com/DeqingSun/CH552-Automatic-Test-Jig/blob/main/python/selfhost_runner_test.py) to test all hex files one by one, to verify if all hex files behave the same way as defined in the test scripts. If every test passes successfully, the whole repo should work well.
+
+### Setup Raspberry Pi
+
+Flash SD card with Raspberry Pi Imager. Setting up Wifi and SSH. A lite versio should be enough.
+
+Run following commands:
+
+```
+echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="4348", ATTRS{idProduct}=="55e0", MODE="0666"' | sudo tee /etc/udev/rules.d/90-ch551-bl.rules > /dev/null
+sudo apt install python3-usb
+sudo apt install python3-serial
+
+mkdir actions-runner && cd actions-runner
+curl -o actions-runner-linux-arm64-2.320.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.320.0/actions-runner-linux-arm64-2.320.0.tar.gz
+tar xzf ./actions-runner-linux-arm64-2.320.0.tar.gz
+```
+
+Check token in https://github.com/DeqingSun/ch55xduino/settings/actions/runners/new?arch=arm64&os=linux
+
+```
+./config.sh --url https://github.com/DeqingSun/ch55xduino --token ***********************
+./run.sh
+```
+
+Autorun: 
+
+run ```sudo nano /etc/systemd/system/actions-runner.service``` add
+
+```
+[Unit]
+Description=GitHub Actions Runner
+After=network.target
+
+[Service]
+ExecStart=/home/pi/actions-runner/run.sh
+WorkingDirectory=/home/pi/actions-runner
+User=pi
+Restart=no    
+
+[Install]
+WantedBy=multi-user.target
+```
+
+run
+```sudo systemctl daemon-reload```
+then
+```
+sudo systemctl enable actions-runner.service
+```
+then
+```
+sudo systemctl start actions-runner.service
+```
+
+
+
+
+
