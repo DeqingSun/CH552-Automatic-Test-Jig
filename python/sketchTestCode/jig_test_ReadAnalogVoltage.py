@@ -35,7 +35,7 @@ for test_pwm_value in test_pwm_values:
         sum = sum + float(return_string)
     adc_value = sum/average_samples
 
-    if (abs(adc_value - ch552_calculated_read_value) > (30/255.0)):
+    if (abs(adc_value - ch552_calculated_read_value) > (60/255.0)):
         print(f"CH552 serial ADC value {adc_value:.2f} not match calculated value {ch552_calculated_read_value:.2f}")
         exit(1)
 

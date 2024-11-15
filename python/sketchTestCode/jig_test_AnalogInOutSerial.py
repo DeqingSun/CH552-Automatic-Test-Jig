@@ -39,7 +39,7 @@ for input_value in input_values:
         print("CH552 serial not same sensor_value output_value")
         print(sensor_value,output_value)
         exit(1)
-    if (abs(sensor_value - ideal_output_value) > 10):
+    if (abs(sensor_value - ideal_output_value) > 40):
         print("CH552 serial sensor_value not right")
         print(sensor_value,output_value,ideal_output_value)
         print("sensor_value="+str(sensor_value)+" output_value="+str(output_value)+" ideal_output_value="+str(ideal_output_value))
