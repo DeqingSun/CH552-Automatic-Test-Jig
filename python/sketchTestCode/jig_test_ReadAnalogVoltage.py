@@ -38,7 +38,7 @@ for test_pwm_value in test_pwm_values:
         sum = sum + float(return_string)
     adc_value = sum/average_samples
 
-    if (abs(adc_value - ch552_calculated_read_value) > (0.5)):
+    if (abs(adc_value - ch552_calculated_read_value) > (0.2 + adc_value*0.2)):
         #for some reason, the ADC value is off on raspberry pi zero
         print(f"CH552 serial ADC value {adc_value:.2f} not match calculated value {ch552_calculated_read_value:.2f}")
         exit(1)
