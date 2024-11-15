@@ -70,7 +70,7 @@ for firmware in compiled_firmwares:
             bootloader_enter_time = time.monotonic()
             ch559_jig.disconnect()
             del ch559_jig
-            #time.sleep(0.5)
+            time.sleep(0.5) #help solve pipe error
             #use vnproch55x to upload the hex file
             upload_start_time = time.monotonic()
             upload_process = subprocess.Popen([upload_tool_path,"-r","2","-t","CH552",firmware], stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
