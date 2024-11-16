@@ -22,17 +22,23 @@ class CH552_serial_code:
             return False
         
         #wait for the port to be ready, or there may be SerialException in opening
-        time.sleep(0.1)
 
-        try:
-            self.serial_port = serial.Serial(ch552_port.device, baudrate, timeout=0)
-        except Exception as e:
-            print("CH55xduino open failed on "+ch552_port.device+" with error: "+type(e).__name__)
-            return False
-        if (self.serial_port == None):
-            print("CH55xduino open failed on "+ch552_port.device)
-            return False
-        return True
+        open_success = False
+
+        for i in range(3):
+            time.sleep(0.1)
+            try:
+                self.serial_port = serial.Serial(ch552_port.device, baudrate, timeout=0)
+            except Exception as e:
+                print("CH55xduino open failed on "+ch552_port.device+" with error: "+type(e).__name__)
+                continue
+            if (self.serial_port == None):
+                print("CH55xduino open failed on "+ch552_port.device)
+                continue
+            open_success = True
+            break
+        
+        return open_success
         
     def disconnect(self):
         if (self.serial_port == None):
