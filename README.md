@@ -94,7 +94,24 @@ then
 sudo systemctl start actions-runner.service
 ```
 
+Auto-restart
 
+create ``` /usr/local/bin/checkwifi.sh ```
+
+```
+ping -c4 192.168.1.1 > /dev/null
+ 
+if [ $? != 0 ] 
+then
+  sudo /sbin/shutdown -r now
+fi
+```
+
+add permission ```sudo chmod 775 /usr/local/bin/checkwifi.sh```
+
+use ```crontab -e```
+
+add ```*/10 * * * * /usr/bin/sudo -H /usr/local/bin/checkwifi.sh >> /dev/null 2>&1``` for every 10 minutes.
 
 
 
